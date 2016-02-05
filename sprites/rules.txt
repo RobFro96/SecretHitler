@@ -1,0 +1,58 @@
+Player:
+    5, 6:
+        facists: 1 + h (knows facist)
+        track: E E 3 K V X
+    7, 8:
+        facist: 2 + h (doesn't know)
+        track: E I P K V X
+    9, 10:
+        facist: 3 + h (doesn't know)
+        track: I I P K V X
+
+11 facist policies, 6 liberal policies
+
+1. Pass president candidacy (clockwise)
+2. Nominate a chancellor
+    5 player: last president can be nominated
+3. Vote
+    More than 50%:
+        3 or more facist policies: ask Hitler -> End Of Game
+    Less than 50%:
+        Election Tracker:
+            3 rejects in a row
+            reveal policy: power is ignored, delete last chancellor
+            reset Election Tracker
+4. Legislative session
+    QUIET!
+    president draws 3 cards from policies deck
+    discard 1
+    pass remaining 2 to chancellor
+    discard 1
+    place on track
+    END QUIET!
+    check: more then 3 cards: shuffle together
+
+5. Executive action
+    execute Presidential power:
+        investigate loyalty:
+            player was not yet investigated
+            passes party membership card
+        call special election:
+            nominates president
+            after special elecation return to original order
+        policy peek:
+            presidents sees top three policies
+        execution:
+            if Hitler -> reveals role card -> game end
+            if not Hitler -> not revealing role card! QUIET!
+        veto power:
+            chancellor and president can consents to discard both policies
+            election tracker + 1
+
+liberals.win:
+    5 liberal policies
+    killing Hitler
+    
+facists.win:
+    6 facist policies
+    Hitler electated as chancellor (mind. 3 policies)
