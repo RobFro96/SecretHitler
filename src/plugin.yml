@@ -1,0 +1,10 @@
+name: SecretHitler
+version: 0
+author: RobFro
+main: de.robfro.secrethitler.Main
+
+commands:
+  test:
+    usage: '/<command>'
+  room:
+    usage: '/<command> [create|cr|spawn|itemFrame|if|electionTracker|et] NAME'

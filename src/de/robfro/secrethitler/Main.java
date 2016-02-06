@@ -1,0 +1,67 @@
+package de.robfro.secrethitler;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import de.robfro.secrethitler.gamer.GamerMgr;
+import de.robfro.secrethitler.general.AdminTools;
+import de.robfro.secrethitler.general.MyLib;
+import de.robfro.secrethitler.general.MyListener;
+import de.robfro.secrethitler.general.SaveMgr;
+import de.robfro.secrethitler.world.RoomMgr;
+
+public class Main extends JavaPlugin {
+
+	public static Main i;
+	
+	// Instanzen der Helfs-Unterklassen
+	public MyListener listener;
+	public AdminTools admintools;
+	public SaveMgr saves;
+	public MyLib mylib;
+	public RoomMgr rooms;
+	public GamerMgr gamermgr;
+
+	// Wichtigste Konstante
+	
+	@Override
+	public void onEnable() {
+		i = this;
+		
+		// Starte die Helfs-Unterklassen
+		admintools = new AdminTools();
+		saves = new SaveMgr();
+		mylib = new MyLib();
+		rooms = new RoomMgr();
+		gamermgr = new GamerMgr();
+		gamermgr.onPluginEnabled();
+		
+		// Starte den Listener
+		listener = new MyListener();
+		getServer().getPluginManager().registerEvents(listener, this);
+
+		getLogger().info("SecretHitler started.");
+	}
+
+	@Override
+	public void onDisable() {
+		gamermgr.saveAllGamers();
+		HandlerList.unregisterAll(listener);
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		switch (label.toLowerCase()) {
+		case "test":
+			return admintools.onCommandTEST(sender, command, label, args);
+		case "room":
+			return rooms.onCommandROOM(sender, command, label, args);
+		}
+			
+		
+		return false;
+	}
+
+}
