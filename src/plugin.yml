@@ -7,4 +7,9 @@ commands:
   test:
     usage: '/<command>'
   room:
-    usage: '/<command> [create|cr|spawn|itemFrame|if|electionTracker|et] NAME'
+    usage: '/<command> create|cr|spawn|itemFrame|if|electionTracker|et  NAME'
+  dummy:
+    usage: '/<command> [ID|NAME]'
+    aliases: [d]
+  chgnm:
+    usage: '/<command>'

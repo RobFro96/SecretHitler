@@ -1,6 +1,7 @@
 package de.robfro.secrethitler.general;
 
 import java.io.File;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -19,6 +20,9 @@ public class SaveMgr {
 	// players.yml
 	private File playersFile;
 	public FileConfiguration players;
+	
+	// Einstellungen
+	public boolean allow_chat_in_lobby;
 
 	public SaveMgr() {
 		// CONFIG
@@ -39,35 +43,57 @@ public class SaveMgr {
 
 	// Erstellt die Defaults der config.yml
 	private void setupDefaults() {
-		config.addDefault("translation.error.wrong_sender", "Die Console kann diesen Befehl nicht ausführen.");
-		config.addDefault("translation.error.no_permission", "Du hast nicht die Rechte um diesen Befehl auszuführen.");
-		config.addDefault("translation.error.number_args", "Die Anzahl der Argumente ist falsch.");
-		config.addDefault("translation.error.not_a_number", "Dein Argument ist keine Zahl.");
-		config.addDefault("translation.error.ingame", "Dieser Befehl darf nicht während eines Spieles ausgeführt werden.");
+		config.addDefault("tr.error.wrong_sender", "Die Console kann diesen Befehl nicht ausführen.");
+		config.addDefault("tr.error.no_permission", "Du hast nicht die Rechte um diesen Befehl auszuführen.");
+		config.addDefault("tr.error.number_args", "Die Anzahl der Argumente ist falsch.");
+		config.addDefault("tr.error.not_a_number", "Dein Argument ist keine Zahl.");
+		config.addDefault("tr.error.ingame", "Dieser Befehl darf nicht während eines Spieles ausgeführt werden.");
 		
-		config.addDefault("translation.error.room_exists", "Dieser Name für einen Raum ist bereits belegt.");
-		config.addDefault("translation.error.room_exists_not", "Dieser Raum existiert nicht.");
+		config.addDefault("tr.error.room_exists", "Dieser Name für einen Raum ist bereits belegt.");
+		config.addDefault("tr.error.room_exists_not", "Dieser Raum existiert nicht.");
+		config.addDefault("tr.error.if_not_exists", "Es existiert hier kein ItemFrame.");
+		config.addDefault("tr.error.sign", "Es existiert hier kein Schild.");
 		
-		config.addDefault("translation.info.room_created", "Der Raum wurde erfolgreich erstellt.");
-		config.addDefault("translation.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
-		config.addDefault("translation.info.room_click", "Klicke links als nächste auf: ");
-		config.addDefault("translation.info.room_if0", "ItemFrameFacists1");
-		config.addDefault("translation.info.room_if1", "ItemFrameFacists2");
-		config.addDefault("translation.info.room_if2", "ItemFrameFacists3");
-		config.addDefault("translation.info.room_if3", "ItemFrameFacists4");
-		config.addDefault("translation.info.room_if4", "ItemFrameFacists5");
-		config.addDefault("translation.info.room_if5", "ItemFrameFacists6");
-		config.addDefault("translation.info.room_if6", "ItemFrameLiberal1");
-		config.addDefault("translation.info.room_if7", "ItemFrameLiberal2");
-		config.addDefault("translation.info.room_if8", "ItemFrameLiberal3");
-		config.addDefault("translation.info.room_if9", "ItemFrameLiberal4");
-		config.addDefault("translation.info.room_if10", "ItemFrameLiberal5");
-		config.addDefault("translation.info.room_et0", "ElectionTracker1");
-		config.addDefault("translation.info.room_et1", "ElectionTracker2");
-		config.addDefault("translation.info.room_et2", "ElectionTracker3");
+		config.addDefault("tr.error.no_dummies", "Du hast keine Dummies.");
 		
-		config.addDefault("translation.command.test", "Teste als Admin die eines Unterprogramms.");
-		config.addDefault("translation.command.room", "Bearbeite oder erstelle einen Raum.");
+		config.addDefault("tr.info.room_created", "Der Raum wurde erfolgreich erstellt.");
+		config.addDefault("tr.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
+		config.addDefault("tr.info.room_click", "Klicke links als nächste auf: ");
+		config.addDefault("tr.info.room_if0", "ItemFrameFacists1");
+		config.addDefault("tr.info.room_if1", "ItemFrameFacists2");
+		config.addDefault("tr.info.room_if2", "ItemFrameFacists3");
+		config.addDefault("tr.info.room_if3", "ItemFrameFacists4");
+		config.addDefault("tr.info.room_if4", "ItemFrameFacists5");
+		config.addDefault("tr.info.room_if5", "ItemFrameFacists6");
+		config.addDefault("tr.info.room_if6", "ItemFrameLiberal1");
+		config.addDefault("tr.info.room_if7", "ItemFrameLiberal2");
+		config.addDefault("tr.info.room_if8", "ItemFrameLiberal3");
+		config.addDefault("tr.info.room_if9", "ItemFrameLiberal4");
+		config.addDefault("tr.info.room_if10", "ItemFrameLiberal5");
+		config.addDefault("tr.info.room_et0", "ElectionTracker1");
+		config.addDefault("tr.info.room_et1", "ElectionTracker2");
+		config.addDefault("tr.info.room_et2", "ElectionTracker3");
+		config.addDefault("tr.info.room_sign", "JoinSign");
+		config.addDefault("tr.info.chgnm", "Dein seriöser Name wurde erfolgreich geändert.");
+		config.addDefault("tr.info.all_pos", "Alle Positionen wurden gesetzt. Erst jetzt wurde gespeichert.");
+		
+		config.addDefault("tr.info.disable_dummy", "Du bist jetzt du selber.");
+		config.addDefault("tr.info.change_dummy", "Du hast auf folgenden Dummy gewechselt: ");
+		
+		config.addDefault("tr.lobby.welcome", "Willkommen auf RobFros-Secret-Hitler-Server!");
+		config.addDefault("tr.lobby.current_longname", "Aktueller seriöser Name: ");
+		config.addDefault("tr.lobby.change_longname", "[Ändern]");
+		config.addDefault("tr.lobby.change_tooltip", "Ein Politiker benötigt |einen seriösen Namen. |Ändere diesen hier.");
+		config.addDefault("tr.lobby.change", "Ändere deinen Name, indem du ihn jetzt in den Chat eingibst.");
+		config.addDefault("tr.lobby.change_info", "Dein seriöser Name wurde erfolgreich geändert.");
+		
+		
+		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
+		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
+		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
+		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
+		
+		config.addDefault("config.allow_chat_in_lobby", true);
 		
 		config.options().copyDefaults(true);
 		
@@ -81,9 +107,12 @@ public class SaveMgr {
 	// Läd die speziellen Einstellungen
 	private void loadSettings() {
 		// Lade die Beschreibung der Commands
-		for (String name : config.getConfigurationSection("translation.command").getKeys(false)) {
-			Main.i.getCommand(name).setDescription(config.getString("translation.command." + name));
+		for (String name : config.getConfigurationSection("tr.command").getKeys(false)) {
+			Main.i.getCommand(name).setDescription(config.getString("tr.command." + name));
 		}
+		
+		// Einstellungen
+		allow_chat_in_lobby = config.getBoolean("config.allow_chat_in_lobby");
 	}
 	
 	public void saveRooms() {
@@ -101,4 +130,5 @@ public class SaveMgr {
 			e.printStackTrace();
 		}
 	}
+
 }

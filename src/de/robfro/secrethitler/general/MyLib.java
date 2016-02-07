@@ -1,8 +1,16 @@
 package de.robfro.secrethitler.general;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 
 import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.Main;
@@ -10,17 +18,16 @@ import de.robfro.secrethitler.Main;
 public class MyLib {
 
 	public void sendError(CommandSender receiver, String configPath) {
-		configPath = "translation.error." + configPath;
+		configPath = "tr.error." + configPath;
 		String text = Main.i.saves.config.getString(configPath);
 		receiver.sendMessage(ChatColor.RED + text);
 	}
 
 	public void sendInfo(CommandSender receiver, String configPath) {
-		configPath = "translation.info." + configPath;
+		configPath = "tr.info." + configPath;
 		String text = Main.i.saves.config.getString(configPath);
 		receiver.sendMessage(ChatColor.GREEN + text);
 	}
-
 
 	public static int ParseInt(String str) {
 		try {
@@ -88,7 +95,7 @@ public class MyLib {
 		String[] split = loc.split(",");
 		if (split.length != 3)
 			return null;
-		return new Location(Main.i.getServer().getWorlds().get(0), ParseInt(split[0]), ParseInt(split[1]), ParseInt(split[2]));
+		return new Location(Main.i.getServer().getWorlds().get(0), ParseInt(split[0])+.5f, ParseInt(split[1])+.5f, ParseInt(split[2])+.5f);
 	}
 	
 	public static String LocationToString(Location loc) {
@@ -103,8 +110,59 @@ public class MyLib {
 		// Wenn null: Vllt hat die Console gesendet?
 		if (g == null) {
 			Main.i.mylib.sendError(sender, "wrong_sender");
+			return null;
 		}
-		return g;
+		
+		if (g.cDummy == -1)
+			return g;
+		
+		if (g.dummies == null)
+			return g;
+		
+		return g.dummies.get(g.cDummy);
+	}
+	
+	public Gamer getGamerFromName(String name) {
+		Gamer g = Main.i.gamermgr.getGamer(name);
+		// Wenn null: Vllt hat die Console gesendet?
+		if (g == null) {
+			return null;
+		}
+		
+		if (g.cDummy == -1)
+			return g;
+		
+		if (g.dummies == null)
+			return g;
+		
+		return g.dummies.get(g.cDummy);
+	}
+	
+	public Inventory copyInventory(Inventory inv) {
+		Inventory i = Main.i.getServer().createInventory(null, InventoryType.PLAYER);
+		i.setContents(inv.getContents().clone());
+		return i;
+	}
+	
+	public static Location IntergerizeLocation(Location orig) {
+		return new Location(orig.getWorld(), orig.getBlockX()+.5f, orig.getBlockY()+.5f, orig.getBlockZ()+.5f);
+	}
+	
+	public ItemFrame getItemFrameInLocation(Location loc) {
+		ArrayList<Entity> es = new ArrayList<>(loc.getWorld().getNearbyEntities(loc, .5f, .5f, .5f));
+		if (es.size() != 1)
+			return null;
+		Entity e = es.get(0);
+		if (!(e instanceof ItemFrame))
+			return null;
+		return (ItemFrame) e;
+	}
+	
+	public Sign getSignInLocation(Location loc) {
+		BlockState bs = loc.getBlock().getState(); 
+		if (bs instanceof Sign)
+			return (Sign) bs;
+		return null;
 	}
 
 }

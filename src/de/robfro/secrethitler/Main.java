@@ -23,8 +23,6 @@ public class Main extends JavaPlugin {
 	public MyLib mylib;
 	public RoomMgr rooms;
 	public GamerMgr gamermgr;
-
-	// Wichtigste Konstante
 	
 	@Override
 	public void onEnable() {
@@ -57,7 +55,12 @@ public class Main extends JavaPlugin {
 		case "test":
 			return admintools.onCommandTEST(sender, command, label, args);
 		case "room":
-			return rooms.onCommandROOM(sender, command, label, args);
+			return admintools.onCommandROOM(sender, command, label, args);
+		case "dummy":
+		case "d":
+			return admintools.onCommandDUMMY(sender, command, label, args);
+		case "chgnm":
+			return gamermgr.onCommandCHGNM(sender, command, label, args);
 		}
 			
 		
