@@ -1,5 +1,7 @@
 package de.robfro.secrethitler.world;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
@@ -7,13 +9,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ItemFrame;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.general.MyLib;
 
 public class Room {
 	
+	// Konstaten: Anzahl der ItemFrames, ElectionTrackerBlöcke
 	public static final int ItemFrameCount = 11;
 	public static final int ElectionTrackerCount = 3;
 	
+	// Eigenschaften eines Raumes
 	public String name;
 	public Location[] itemFrameLocations;
 	public Location[] electionTracker;
@@ -21,9 +26,15 @@ public class Room {
 	public Sign sign;
 	public boolean all_right;
 	
+	// Spielerbezogenene Eigenschaften
+	public ArrayList<Gamer> gamers;
+	public boolean playing = false;
+	
+	
+	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
 		name = key;
-		
+		gamers = new ArrayList<>();		
 		all_right = true;
 		
 		itemFrameLocations = new Location[ItemFrameCount];
@@ -72,20 +83,18 @@ public class Room {
 			all_right = false;
 		}
 		
-		System.out.println(all_right);
-		if (all_right) {
-			sign.setLine(0, ChatColor.DARK_BLUE + "[" + name + "]");
-			sign.update();
-		}
 	}
 	
+	// Erstelle einen neuen Raum
 	public Room(String name) {
 		this.name = name;
 		itemFrameLocations = new Location[ItemFrameCount];
 		electionTracker = new Location[ElectionTrackerCount];
 		spawn = null;
+		gamers = new ArrayList<>();
 	}
 	
+	// Speichere den Raum
 	public void saveYAML() {
 		FileConfiguration c = Main.i.saves.rooms;
 		for (int i = 0; i<ItemFrameCount; i++) {
@@ -106,4 +115,17 @@ public class Room {
 		}
 	}
 
+	// Beschrifte das JoinSchild neu
+	public void updateSign() {
+		if (!all_right)
+			return;
+		FileConfiguration c = Main.i.saves.config;
+		sign.setLine(0, ChatColor.DARK_BLUE.toString() + ChatColor.BOLD + "[" + name + "]");
+		sign.setLine(1, c.getString("tr.lobby.player") + ": " + gamers.size() + "/" + Main.i.saves.max_player);
+		if (playing)
+			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.DARK_RED + c.getString("tr.lobby.playing"));
+		else
+			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.GREEN + c.getString("tr.lobby.waiting"));
+		sign.update();
+	}
 }

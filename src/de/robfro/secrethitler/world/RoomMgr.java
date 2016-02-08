@@ -17,6 +17,8 @@ public class RoomMgr {
 		for (String key: c.getKeys(false)) {
 			rooms.put(key, new Room(c, key));
 		}
+		
+		updateAllSigns();
 	}
 	
 	// Speichern der Räume
@@ -25,6 +27,13 @@ public class RoomMgr {
 			r.saveYAML();
 		}
 		Main.i.saves.saveRooms();
+	}
+	
+	// Update alle JoinSchilder
+	public void updateAllSigns() {
+		for (Room r : rooms.values()) {
+			r.updateSign();
+		}
 	}
 	
 }

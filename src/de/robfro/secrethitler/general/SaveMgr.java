@@ -23,6 +23,7 @@ public class SaveMgr {
 	
 	// Einstellungen
 	public boolean allow_chat_in_lobby;
+	public int max_player;
 
 	public SaveMgr() {
 		// CONFIG
@@ -86,6 +87,9 @@ public class SaveMgr {
 		config.addDefault("tr.lobby.change_tooltip", "Ein Politiker benötigt |einen seriösen Namen. |Ändere diesen hier.");
 		config.addDefault("tr.lobby.change", "Ändere deinen Name, indem du ihn jetzt in den Chat eingibst.");
 		config.addDefault("tr.lobby.change_info", "Dein seriöser Name wurde erfolgreich geändert.");
+		config.addDefault("tr.lobby.player", "Spieler");
+		config.addDefault("tr.lobby.waiting", "OFFEN");
+		config.addDefault("tr.lobby.playing", "IM SPIEL");
 		
 		
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
@@ -94,6 +98,7 @@ public class SaveMgr {
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
 		
 		config.addDefault("config.allow_chat_in_lobby", true);
+		config.addDefault("config.max_player_in_room", 10);
 		
 		config.options().copyDefaults(true);
 		
@@ -113,6 +118,7 @@ public class SaveMgr {
 		
 		// Einstellungen
 		allow_chat_in_lobby = config.getBoolean("config.allow_chat_in_lobby");
+		max_player = config.getInt("config.max_player_in_room");
 	}
 	
 	public void saveRooms() {
