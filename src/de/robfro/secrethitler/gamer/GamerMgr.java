@@ -84,7 +84,7 @@ public class GamerMgr {
 			return true;
 		
 		if (g.state != 0) {
-			Main.i.mylib.sendError(sender, "ingame");
+			Main.i.mylib.sendError(g, "ingame");
 			return false;
 		}
 		
@@ -105,7 +105,7 @@ public class GamerMgr {
 		// Check Flags
 		if (g.inputLongName) {
 			g.longName = e.getMessage();
-			Main.i.mylib.sendInfo(g.player, "chgnm");
+			Main.i.mylib.sendInfo(g, "chgnm");
 			return;
 		}
 		

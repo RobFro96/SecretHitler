@@ -1,5 +1,6 @@
 package de.robfro.secrethitler.general;
 
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,6 +30,10 @@ public class MyListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
 			e.setCancelled(Main.i.admintools.onPlayerClickBlock(e.getPlayer(), e.getClickedBlock().getLocation()));
+		} else if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (e.getClickedBlock().getState() instanceof Sign) {
+				Main.i.rooms.onClickedSign(e);
+			}
 		}
 	}
 	

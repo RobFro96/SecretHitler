@@ -128,4 +128,36 @@ public class Room {
 			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.GREEN + c.getString("tr.lobby.waiting"));
 		sign.update();
 	}
+
+	// Ein Spieler will diesen Raum joinen
+	public void join(Gamer g) {
+		// CHECK: Raum spielt nicht
+		if (playing) {
+			Main.i.mylib.sendError(g, "room_ingame");
+			return;
+		}
+				
+		// CHECK: Noch ein Platz frei
+		if (gamers.size() >= Main.i.saves.max_player) {
+			Main.i.mylib.sendError(g, "room_full");
+			return;
+		}
+		
+		// Er joint
+		g.state = 1;
+		g.joinedRoom = this;
+		gamers.add(g);
+		sendMessage(ChatColor.YELLOW + Main.i.saves.config.getString("tr.waiting.join").replaceAll("#name", g.longName));
+		
+		if (! g.isDummy)
+			g.player.teleport(spawn);
+		
+		updateSign();
+	}
+	
+	// Sendet eine Nachricht an alle Spieler in diesem Raum
+	public void sendMessage(String msg) {
+		for (Gamer g : gamers)
+			g.sendMessage(msg);
+	}
 }

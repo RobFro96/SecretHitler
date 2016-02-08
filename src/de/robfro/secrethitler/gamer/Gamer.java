@@ -34,6 +34,9 @@ public class Gamer {
 	// Flags
 	public boolean inputLongName = false;
 	public Room editingRoom;
+	
+	// Ingame
+	public Room joinedRoom;
 
 	// EchterSpieler Konstruktor
 	public Gamer(Player player) {
@@ -99,7 +102,9 @@ public class Gamer {
 	// Sende eine Nachricht an den Spieler, wenn ein Dummy angesprochen wird
 	// kommt an @Dummy davor
 	public void sendMessage(String text) {
-		if (!isDummy || master.isCurrentDummy(this))
+		if (!isDummy && cDummy != -1)
+			player.sendMessage(ChatColor.GRAY + "@me: " + ChatColor.RESET + text);
+		else if (!isDummy || master.isCurrentDummy(this))
 			player.sendMessage(text);
 		else
 			player.sendMessage(ChatColor.GRAY + "@" + name + ": " + ChatColor.RESET + text);

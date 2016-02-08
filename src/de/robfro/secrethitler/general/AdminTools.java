@@ -123,7 +123,7 @@ public class AdminTools {
 		// Lade das Inventar / Nachricht
 		if (g.cDummy == -1) {
 			g.player.getInventory().setContents(g.inventory.getContents());
-			Main.i.mylib.sendInfo(sender, "disable_dummy");
+			Main.i.mylib.sendInfo(g, "disable_dummy");
 		} else {
 			g.player.getInventory().setContents(g.dummies.get(g.cDummy).inventory.getContents());
 			g.sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.info.change_dummy")
@@ -164,7 +164,7 @@ public class AdminTools {
 			}
 
 			Main.i.rooms.rooms.put(args[0], new Room(args[0]));
-			Main.i.mylib.sendInfo(sender, "room_created");
+			Main.i.mylib.sendInfo(g, "room_created");
 
 			Main.i.rooms.save();
 			return true;
@@ -231,12 +231,12 @@ public class AdminTools {
 			Sign sign = Main.i.mylib.getSignInLocation(loc);
 			
 			if (sign == null) {
-				Main.i.mylib.sendError(g.player, "sign_not_exists");
+				Main.i.mylib.sendError(g, "sign_not_exists");
 				return true;
 			}
 			
 			g.editingRoom.signloc = loc;
-			Main.i.mylib.sendInfo(g.player, "all_pos");
+			Main.i.mylib.sendInfo(g, "all_pos");
 			g.state = 0;
 			Main.i.rooms.save();
 			return true;

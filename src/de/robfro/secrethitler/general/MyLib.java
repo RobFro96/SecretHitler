@@ -22,11 +22,23 @@ public class MyLib {
 		String text = Main.i.saves.config.getString(configPath);
 		receiver.sendMessage(ChatColor.RED + text);
 	}
+	
+	public void sendError(Gamer g, String configPath) {
+		configPath = "tr.error." + configPath;
+		String text = Main.i.saves.config.getString(configPath);
+		g.sendMessage(ChatColor.RED + text);
+	}
 
 	public void sendInfo(CommandSender receiver, String configPath) {
 		configPath = "tr.info." + configPath;
 		String text = Main.i.saves.config.getString(configPath);
 		receiver.sendMessage(ChatColor.GREEN + text);
+	}
+	
+	public void sendInfo(Gamer g, String configPath) {
+		configPath = "tr.info." + configPath;
+		String text = Main.i.saves.config.getString(configPath);
+		g.sendMessage(ChatColor.GREEN + text);
 	}
 
 	public static int ParseInt(String str) {
