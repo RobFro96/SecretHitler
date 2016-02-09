@@ -51,6 +51,8 @@ public class SaveMgr {
 		config.addDefault("tr.error.number_args", "Die Anzahl der Argumente ist falsch.");
 		config.addDefault("tr.error.not_a_number", "Dein Argument ist keine Zahl.");
 		config.addDefault("tr.error.ingame", "Diese Aktion darf nicht während eines Spieles ausgeführt werden.");
+		config.addDefault("tr.error.not_ingame", "Diese Aktion kann nur innerhalb eines Raumes ausgeführt werden.");
+		config.addDefault("tr.error.playing", "Diese Aktion kann nur während der Wartezeit ausgeführt werden.");
 
 		config.addDefault("tr.error.room_exists", "Dieser Name für einen Raum ist bereits belegt.");
 		config.addDefault("tr.error.room_exists_not", "Dieser Raum existiert nicht.");
@@ -62,6 +64,7 @@ public class SaveMgr {
 		config.addDefault("tr.error.room_ingame",
 				"Dieser Raum kann nicht betreten werden, da dieser sich in einem Spiel befindet.");
 		config.addDefault("tr.error.room_full", "Es gibt in diesen Raum keinen freien Platz mehr.");
+		config.addDefault("tr.error.drop_item", "Items dürfen nicht fallengelassen werden.");
 
 		config.addDefault("tr.info.room_created", "Der Raum wurde erfolgreich erstellt.");
 		config.addDefault("tr.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
@@ -97,14 +100,26 @@ public class SaveMgr {
 		config.addDefault("tr.lobby.player", "Spieler");
 		config.addDefault("tr.lobby.waiting", "OFFEN");
 		config.addDefault("tr.lobby.playing", "IM SPIEL");
+		config.addDefault("tr.lobby.join", "#name hat den Server betreten.");
+		config.addDefault("tr.lobby.quit", "#name hat dem Server verlassen.");
 		
 		config.addDefault("tr.waiting.join", "#name hat diesen Raum betreten.");
+		config.addDefault("tr.waiting.quit", "#name hat diesen Raum verlassen.");
 
 
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
+		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
+		
+		config.addDefault("tr.maps.plc_liberal", "Liberale Poltik");
+		config.addDefault("tr.maps.plc_facist", "Faschistische Politik");
+		config.addDefault("tr.maps.rl_facist", "Rolle: Faschist");
+		config.addDefault("tr.maps.rl_hitler", "Rolle: Hitler");
+		config.addDefault("tr.maps.rl_liberal", "Rolle: Liberaler");
+		config.addDefault("tr.maps.vt_ja", "JA");
+		config.addDefault("tr.maps.vt_nein", "NEIN");
 
 		config.addDefault("config.allow_chat_in_lobby", true);
 		config.addDefault("config.max_player_in_room", 10);
@@ -113,6 +128,23 @@ public class SaveMgr {
 		config.addDefault("config.wait.min_player", 5);
 		config.addDefault("config.wait.wait_at_min", 60);
 		config.addDefault("config.wait.less_per_player", 10);
+		
+		config.addDefault("config.maps.plc_liberal", 100);
+		config.addDefault("config.maps.plc_facist", 101);
+		config.addDefault("config.maps.rl_facist", 102);
+		config.addDefault("config.maps.rl_hitler", 103);
+		config.addDefault("config.maps.rl_liberal", 104);
+		config.addDefault("config.maps.vt_ja", 105);
+		config.addDefault("config.maps.vt_nein", 106);
+		config.addDefault("config.maps.brd_facempty", 107);
+		config.addDefault("config.maps.brd_facend", 108);
+		config.addDefault("config.maps.brd_invest", 109);
+		config.addDefault("config.maps.brd_kill", 110);
+		config.addDefault("config.maps.brd_veto", 111);
+		config.addDefault("config.maps.brd_libempty", 112);
+		config.addDefault("config.maps.brd_libend", 113);
+		config.addDefault("config.maps.brd_presd", 114);
+		config.addDefault("config.maps.brd_exam", 115);
 
 		config.options().copyDefaults(true);
 

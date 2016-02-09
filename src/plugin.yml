@@ -13,3 +13,5 @@ commands:
     aliases: [d]
   chgnm:
     usage: '/<command>'
+  wait:
+    usage: '/<command> SEC'

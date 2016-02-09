@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.game.Role;
 import de.robfro.secrethitler.world.Room;
 import mkremins.fanciful.FancyMessage;
 
@@ -37,7 +38,9 @@ public class Gamer {
 	
 	// Ingame
 	public Room joinedRoom;
-
+	public Role role;
+	
+	
 	// EchterSpieler Konstruktor
 	public Gamer(Player player) {
 		this.player = player;

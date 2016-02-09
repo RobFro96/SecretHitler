@@ -1,12 +1,15 @@
 package de.robfro.secrethitler.general;
 
 import org.bukkit.block.Sign;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -20,11 +23,13 @@ public class MyListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Main.i.gamermgr.onPlayerJoin(e);
+		e.setJoinMessage("");
 	}
 	
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		Main.i.gamermgr.onPlayerQuit(e);
+		e.setQuitMessage("");
 	}
 	
 	@EventHandler
@@ -59,5 +64,25 @@ public class MyListener implements Listener {
 		// Update die Räume
 		for (Room r : Main.i.rooms.rooms.values())
 			r.onTimerOneSecond();
+	}
+	
+	
+	// Player dürfen ItemFrames nicht manipulieren
+	@EventHandler
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
+		if (e.getRightClicked() instanceof ItemFrame) {
+			if (e.getPlayer().hasPermission("sh.admin"))
+				return;
+			e.setCancelled(true);
+		}
+	}
+	
+	// Player dürfen keine Items fallen lassen
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent e) {
+		if (e.getPlayer().hasPermission("sh.admin"))
+			return;
+		e.setCancelled(true);
+		Main.i.mylib.sendError(e.getPlayer(), "drop_item");
 	}
 }

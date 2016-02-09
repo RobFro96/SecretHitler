@@ -19,8 +19,6 @@ public class RoomMgr {
 		for (String key: c.getKeys(false)) {
 			rooms.put(key, new Room(c, key));
 		}
-		
-		updateAllSigns();
 	}
 	
 	// Speichern der Räume

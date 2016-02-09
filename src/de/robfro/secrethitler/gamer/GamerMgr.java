@@ -40,6 +40,9 @@ public class GamerMgr {
 		g.loadYAML();
 		if (getGamer(g.name) == null)
 			gamers.add(g);
+		
+		sendLobbyMessage(ChatColor.YELLOW + Main.i.saves.config.getString("tr.lobby.join").replaceAll("#name", g.longName));
+		
 		g.sendWelcomeMessage();
 		
 		if (Main.i.saves.spawnPoint != null)
@@ -47,8 +50,9 @@ public class GamerMgr {
 		if (!g.player.hasPermission("sh.admin")) {
 			g.player.getInventory().clear();
 			g.player.setGameMode(GameMode.ADVENTURE);
-			g.player.setLevel(0);
 		}
+		g.player.setLevel(0);
+		g.player.setExp(0);
 	}
 
 	// Lösche den Gamer für den Spieler, der gerade geleavt ist
@@ -57,12 +61,21 @@ public class GamerMgr {
 			if (g.name.equals(e.getPlayer().getName())) {
 				g.saveYAML();
 				gamers.remove(g);
+				
+				if (g.joinedRoom != null)
+					g.joinedRoom.quit(g);
+				
 				if (g.dummies != null) {
 					for (Gamer d : g.dummies) {
 						d.saveYAML();
 						gamers.remove(d);
+						if (d.joinedRoom != null)
+							d.joinedRoom.quit(d);
 					}
 				}
+				
+				sendLobbyMessage(ChatColor.YELLOW + Main.i.saves.config.getString("tr.lobby.quit").replaceAll("#name", g.longName));
+				
 				break;
 			}
 		}
@@ -114,20 +127,28 @@ public class GamerMgr {
 		// Check Flags
 		if (g.inputLongName) {
 			g.longName = e.getMessage();
+			g.inputLongName = false;
 			Main.i.mylib.sendInfo(g, "chgnm");
 			return;
 		}
 		
 		// In der Lobby
 		if (g.state == 0) {
-			// Check: Chatten ist erlaubt in der Lobby
-			if (!Main.i.saves.allow_chat_in_lobby)
+			sendLobbyMessage("<" + g.longName + "> " + e.getMessage());
+		} else if (g.state == 1) {
+			if (g.joinedRoom == null)
 				return;
-			String msg = "<" + g.longName + "> " + e.getMessage();
-			for (Gamer r : gamers) {
-				if (r.state == 0) {
-					r.sendMessage(msg);
-				}
+			g.joinedRoom.sendMessage("<" + g.longName + "> " + e.getMessage());
+		}
+	}
+	
+	public void sendLobbyMessage(String msg) {
+		// Check: Chatten ist erlaubt in der Lobby
+		if (!Main.i.saves.allow_chat_in_lobby)
+			return;
+		for (Gamer r : gamers) {
+			if (r.state == 0) {
+				r.sendMessage(msg);
 			}
 		}
 	}

@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.robfro.secrethitler.game.CardMgr;
 import de.robfro.secrethitler.gamer.GamerMgr;
 import de.robfro.secrethitler.general.AdminTools;
 import de.robfro.secrethitler.general.MyLib;
@@ -23,6 +24,7 @@ public class Main extends JavaPlugin {
 	public MyLib mylib;
 	public RoomMgr rooms;
 	public GamerMgr gamermgr;
+	public CardMgr cardmgr;
 	
 	@Override
 	public void onEnable() {
@@ -35,6 +37,7 @@ public class Main extends JavaPlugin {
 		rooms = new RoomMgr();
 		gamermgr = new GamerMgr();
 		gamermgr.onPluginEnabled();
+		cardmgr = new CardMgr();
 		
 		// Starte den Listener
 		listener = new MyListener();
@@ -47,6 +50,7 @@ public class Main extends JavaPlugin {
 				listener.onTimerOneSecond();
 			}
 		}, 20L, 20L);
+		
 	}
 
 	@Override
@@ -67,6 +71,8 @@ public class Main extends JavaPlugin {
 			return admintools.onCommandDUMMY(sender, command, label, args);
 		case "chgnm":
 			return gamermgr.onCommandCHGNM(sender, command, label, args);
+		case "wait":
+			return admintools.onCommandWAIT(sender, command, label, args);
 		}
 			
 		

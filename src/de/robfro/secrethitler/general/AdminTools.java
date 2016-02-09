@@ -59,6 +59,31 @@ public class AdminTools {
 			if (rec == null)
 				return true;
 			rec.sendMessage(args[2]);
+			return true;
+		case "quit":
+			if(args.length < 2)
+				return true;
+			Gamer quitter = Main.i.mylib.getGamerFromName(args[1]);
+			if (quitter == null)
+				return true;
+			if (quitter.joinedRoom == null)
+				return true;
+			quitter.joinedRoom.quit(quitter);
+			return true;
+		case "start":
+			Room r = Main.i.rooms.rooms.get("Raum1");
+			r.join(Main.i.gamermgr.getGamer("Dummy1"));
+			r.join(Main.i.gamermgr.getGamer("Dummy2"));
+			r.join(Main.i.gamermgr.getGamer("Dummy3"));
+			r.join(Main.i.gamermgr.getGamer("Dummy4"));
+			r.join(Main.i.gamermgr.getGamer("Dummy5"));
+			
+			onCommandDUMMY(sender, command, label, new String[]{"0"});
+			onCommandWAIT(sender, command, label, new String[] {"0"});
+			
+			g.player.teleport(r.spawn);
+			
+			return true;
 		}
 
 
@@ -276,5 +301,48 @@ public class AdminTools {
 		}
 
 		return false;
+	}
+
+	// Befehl zum Ändern der Wartezeit
+	public boolean onCommandWAIT(CommandSender sender, Command command, String label, String[] args) {
+		// CHECK: Admin
+		if (!sender.hasPermission("sh.admin")) {
+			Main.i.mylib.sendError(sender, "no_permission");
+			return true;
+		}
+
+		Gamer g = Main.i.mylib.getGamerFromSender(sender);
+		if (g == null)
+			return true;
+
+		// CHECK: nicht ingame, joined Room gesetzt
+		if (g.state == 0 || g.joinedRoom == null) {
+			Main.i.mylib.sendError(g, "not_ingame");
+			return true;
+		}
+		
+		// CHECK: Room ist nicht ingame
+		if (g.joinedRoom.playing) {
+			Main.i.mylib.sendError(g, "playing");
+			return true;
+		}
+		
+		// CHECK: Anzahl der Argumente
+		if (args.length != 1) {
+			Main.i.mylib.sendError(g, "number_args");
+			return true;
+		}
+		
+		int time = MyLib.ParseInt(args[0]);
+		// CHECK: time ist gültig
+		if (time == Integer.MIN_VALUE) {
+			Main.i.mylib.sendError(g, "not_a_number");
+			return true;
+		}
+		
+		g.joinedRoom.waiting_time = time;
+		g.joinedRoom.onTimerOneSecond();
+		
+		return true;
 	}
 }
