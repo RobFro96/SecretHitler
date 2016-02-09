@@ -41,7 +41,6 @@ public class Gamer {
 	// EchterSpieler Konstruktor
 	public Gamer(Player player) {
 		this.player = player;
-		player.getInventory().clear();
 
 		name = player.getName();
 		state = 0;

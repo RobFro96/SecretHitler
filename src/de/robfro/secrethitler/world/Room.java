@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ItemFrame;
@@ -29,12 +30,12 @@ public class Room {
 	// Spielerbezogenene Eigenschaften
 	public ArrayList<Gamer> gamers;
 	public boolean playing = false;
+	public int waiting_time;
 	
 	
 	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
-		name = key;
-		gamers = new ArrayList<>();		
+		name = key;	
 		all_right = true;
 		
 		itemFrameLocations = new Location[ItemFrameCount];
@@ -82,7 +83,7 @@ public class Room {
 			Main.i.getLogger().warning("Sign is not defined in " + key + ".");
 			all_right = false;
 		}
-		
+		resetRoom();
 	}
 	
 	// Erstelle einen neuen Raum
@@ -91,7 +92,8 @@ public class Room {
 		itemFrameLocations = new Location[ItemFrameCount];
 		electionTracker = new Location[ElectionTrackerCount];
 		spawn = null;
-		gamers = new ArrayList<>();
+		
+		resetRoom();
 	}
 	
 	// Speichere den Raum
@@ -129,8 +131,20 @@ public class Room {
 		sign.update();
 	}
 
+	// Setzt den Raum in einen Ausgangszustand zurück.
+	private void resetRoom() {
+		if (!all_right)
+			return;
+		
+		gamers = new ArrayList<>();
+		waiting_time = Main.i.saves.config.getInt("config.wait.wait_at_min");
+	}
+	
 	// Ein Spieler will diesen Raum joinen
 	public void join(Gamer g) {
+		if (!all_right)
+			return;
+		
 		// CHECK: Raum spielt nicht
 		if (playing) {
 			Main.i.mylib.sendError(g, "room_ingame");
@@ -160,4 +174,31 @@ public class Room {
 		for (Gamer g : gamers)
 			g.sendMessage(msg);
 	}
+
+	// Nach einer Sekunde wird wird die Zeit verringert
+	public void onTimerOneSecond() {
+		FileConfiguration c = Main.i.saves.config;
+		if (gamers.size() < c.getInt("config.wait.min_player")) {
+			waiting_time = c.getInt("config.wait.wait_at_min");
+		}
+		else {
+			waiting_time--;
+			if (waiting_time <= 5)
+				sendTone();
+		}
+		setLevel(waiting_time);
+	}
+	
+	// Sende an alle Spieler einen Ton
+	private void sendTone() {
+		for (Gamer g : gamers)
+			g.player.playSound(g.player.getLocation(), Sound.NOTE_PLING, 1f, 1f);
+	}
+	
+	// Update die Levelanzeige aller Spieler
+	private void setLevel(int lvl) {
+		for (Gamer g : gamers)
+			g.player.setLevel(lvl);
+	}
+	
 }

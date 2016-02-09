@@ -2,6 +2,7 @@ package de.robfro.secrethitler.general;
 
 import java.io.File;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -24,6 +25,7 @@ public class SaveMgr {
 	// Einstellungen
 	public boolean allow_chat_in_lobby;
 	public int max_player;
+	public Location spawnPoint;
 
 	public SaveMgr() {
 		// CONFIG
@@ -106,9 +108,11 @@ public class SaveMgr {
 
 		config.addDefault("config.allow_chat_in_lobby", true);
 		config.addDefault("config.max_player_in_room", 10);
+		config.addDefault("config.spawnpoint", "13,22,63");
+		
 		config.addDefault("config.wait.min_player", 5);
 		config.addDefault("config.wait.wait_at_min", 60);
-		config.addDefault("config.wait.wait_at_max", 15);
+		config.addDefault("config.wait.less_per_player", 10);
 
 		config.options().copyDefaults(true);
 
@@ -129,6 +133,10 @@ public class SaveMgr {
 		// Einstellungen
 		allow_chat_in_lobby = config.getBoolean("config.allow_chat_in_lobby");
 		max_player = config.getInt("config.max_player_in_room");
+		spawnPoint = MyLib.ParseLocation(config.getString("config.spawnpoint"));
+		if (spawnPoint == null) {
+			Main.i.getLogger().warning("Spawnpoint is not defined.");
+		}
 	}
 
 	public void saveRooms() {

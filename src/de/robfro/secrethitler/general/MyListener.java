@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.world.Room;
 
 public class MyListener implements Listener {
 	
@@ -52,5 +53,11 @@ public class MyListener implements Listener {
 	public void onWeatherChange(WeatherChangeEvent e) {
 		if (e.toWeatherState())
 			e.setCancelled(true);
+	}
+	
+	public void onTimerOneSecond() {
+		// Update die Räume
+		for (Room r : Main.i.rooms.rooms.values())
+			r.onTimerOneSecond();
 	}
 }

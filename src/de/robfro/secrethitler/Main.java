@@ -41,6 +41,12 @@ public class Main extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(listener, this);
 
 		getLogger().info("SecretHitler started.");
+			
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			public void run() {
+				listener.onTimerOneSecond();
+			}
+		}, 20L, 20L);
 	}
 
 	@Override

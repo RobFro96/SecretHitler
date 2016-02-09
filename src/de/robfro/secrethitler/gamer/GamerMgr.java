@@ -3,6 +3,7 @@ package de.robfro.secrethitler.gamer;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -40,6 +41,14 @@ public class GamerMgr {
 		if (getGamer(g.name) == null)
 			gamers.add(g);
 		g.sendWelcomeMessage();
+		
+		if (Main.i.saves.spawnPoint != null)
+			g.player.teleport(Main.i.saves.spawnPoint);
+		if (!g.player.hasPermission("sh.admin")) {
+			g.player.getInventory().clear();
+			g.player.setGameMode(GameMode.ADVENTURE);
+			g.player.setLevel(0);
+		}
 	}
 
 	// Lösche den Gamer für den Spieler, der gerade geleavt ist
