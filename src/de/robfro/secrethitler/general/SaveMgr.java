@@ -2,6 +2,7 @@ package de.robfro.secrethitler.general;
 
 import java.io.File;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -65,6 +66,10 @@ public class SaveMgr {
 				"Dieser Raum kann nicht betreten werden, da dieser sich in einem Spiel befindet.");
 		config.addDefault("tr.error.room_full", "Es gibt in diesen Raum keinen freien Platz mehr.");
 		config.addDefault("tr.error.drop_item", "Items dürfen nicht fallengelassen werden.");
+		
+		config.addDefault("tr.error.not_presd", "Nur den Präsident darf diesen Befehl ausführen.");
+		config.addDefault("tr.error.not_a_player", "Das Argument verweist auf keinen Spieler.");
+		config.addDefault("tr.error.cant_nominated", "Dieser Spieler kann nicht nominiert werden.");
 
 		config.addDefault("tr.info.room_created", "Der Raum wurde erfolgreich erstellt.");
 		config.addDefault("tr.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
@@ -105,13 +110,30 @@ public class SaveMgr {
 		
 		config.addDefault("tr.waiting.join", "#name hat diesen Raum betreten.");
 		config.addDefault("tr.waiting.quit", "#name hat diesen Raum verlassen.");
-
+		
+		config.addDefault("tr.pregame.started", "Das Spiel wird gestartet.");
+		config.addDefault("tr.pregame.your_role", "Deine geheime Rolle in diesem Spiel ist: ");
+		config.addDefault("tr.pregame.rl_hitler", ChatColor.DARK_RED + "Hitler");
+		config.addDefault("tr.pregame.rl_facist", ChatColor.RED + "Faschist");
+		config.addDefault("tr.pregame.rl_liberal", ChatColor.DARK_AQUA + "Liberaler");
+		config.addDefault("tr.pregame.your_fuehrer", "Folgender Spieler ist Hitler: ");
+		config.addDefault("tr.pregame.other_facists", "Folgende Spieler spielen ebenfalls als Faschist: ");
+		
+		config.addDefault("tr.game.pres_was_elected", "#name wurde zum Präsidenten gewählt.");
+		config.addDefault("tr.game.nominate_chancell", "Als Präsindent musst du nun einen Kanzler nominieren.");
+		config.addDefault("tr.game.nom.yes", "Nominiere diesen Spieler.");
+		config.addDefault("tr.game.nom.president", "Der Präsident darf sich nicht nominieren.");
+		config.addDefault("tr.game.nom.last_chanc", "Der letzte Kanzler darf nicht nominiert werden.");
+		config.addDefault("tr.game.nom.last_presd", "Der letzte Präsident darf nicht nominiert werden.");
+		config.addDefault("tr.game.vote", "Der Präsident schlägt #name als Kanzler vor. Bitte stimmet ab.");
+		config.addDefault("tr.game.votehelp", "Rechtsklick mit der entsprechende Wahlkarte.");
 
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
 		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
+		config.addDefault("tr.command.nominate", "Wird genutz, um einen Spieler zu nominieren.");
 		
 		config.addDefault("tr.maps.plc_liberal", "Liberale Poltik");
 		config.addDefault("tr.maps.plc_facist", "Faschistische Politik");

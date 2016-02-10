@@ -61,7 +61,7 @@ public class AdminTools {
 			rec.sendMessage(args[2]);
 			return true;
 		case "quit":
-			if(args.length < 2)
+			if (args.length < 2)
 				return true;
 			Gamer quitter = Main.i.mylib.getGamerFromName(args[1]);
 			if (quitter == null)
@@ -77,12 +77,12 @@ public class AdminTools {
 			r.join(Main.i.gamermgr.getGamer("Dummy3"));
 			r.join(Main.i.gamermgr.getGamer("Dummy4"));
 			r.join(Main.i.gamermgr.getGamer("Dummy5"));
-			
-			onCommandDUMMY(sender, command, label, new String[]{"0"});
-			onCommandWAIT(sender, command, label, new String[] {"0"});
-			
+
+			onCommandDUMMY(sender, command, label, new String[] { "0" });
+			onCommandWAIT(sender, command, label, new String[] { "0" });
+
 			g.player.teleport(r.spawn);
-			
+
 			return true;
 		}
 
@@ -135,26 +135,31 @@ public class AdminTools {
 				}
 			}
 		}
+		
+		changeDummy(g, changeTo);
 
+		return true;
+	}
+
+	public void changeDummy(Gamer master, int changeTo) {
 		// Sichere das Inventar
-		if (g.cDummy == -1) {
-			g.inventory = Main.i.mylib.copyInventory(g.player.getInventory());
+		if (master.cDummy == -1) {
+			master.inventory = Main.i.mylib.copyInventory(master.player.getInventory());
 		} else {
-			g.dummies.get(g.cDummy).inventory = Main.i.mylib.copyInventory(g.player.getInventory());
+			master.dummies.get(master.cDummy).inventory = Main.i.mylib.copyInventory(master.player.getInventory());
 		}
 
-		g.cDummy = changeTo;
+		master.cDummy = changeTo;
 
 		// Lade das Inventar / Nachricht
-		if (g.cDummy == -1) {
-			g.player.getInventory().setContents(g.inventory.getContents());
-			Main.i.mylib.sendInfo(g, "disable_dummy");
+		if (master.cDummy == -1) {
+			master.player.getInventory().setContents(master.inventory.getContents());
+			Main.i.mylib.sendInfo(master, "disable_dummy");
 		} else {
-			g.player.getInventory().setContents(g.dummies.get(g.cDummy).inventory.getContents());
-			g.sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.info.change_dummy")
-					+ g.dummies.get(g.cDummy).name);
+			master.player.getInventory().setContents(master.dummies.get(master.cDummy).inventory.getContents());
+			master.sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.info.change_dummy")
+					+ master.dummies.get(master.cDummy).name);
 		}
-		return true;
 	}
 
 	// Befehl zum Bearbeiten / Erstellen eines Raumes
@@ -240,7 +245,7 @@ public class AdminTools {
 			g.sendMessage(c.getString("tr.info.room_click") + c.getString("tr.info.room_et" + nr));
 		else if (g.state >= 100)
 			g.sendMessage(c.getString("tr.info.room_click") + c.getString("tr.info.room_if" + nr));
-		
+
 	}
 
 	// Wenn Spieler auf eine Block klickt
@@ -250,22 +255,22 @@ public class AdminTools {
 			return false;
 
 		loc = MyLib.IntergerizeLocation(loc);
-		
+
 		if (g.state >= 300) {
 			// JoinSchild
 			Sign sign = Main.i.mylib.getSignInLocation(loc);
-			
+
 			if (sign == null) {
 				Main.i.mylib.sendError(g, "sign_not_exists");
 				return true;
 			}
-			
+
 			g.editingRoom.signloc = loc;
 			Main.i.mylib.sendInfo(g, "all_pos");
 			g.state = 0;
 			Main.i.rooms.save();
 			return true;
-			
+
 		} else if (g.state >= 200) {
 			// Election Tracker
 			g.editingRoom.electionTracker[g.state % 100] = loc;
@@ -281,12 +286,12 @@ public class AdminTools {
 		} else if (g.state >= 100) {
 			// ItemFrame
 			ItemFrame itemf = Main.i.mylib.getItemFrameInLocation(loc);
-			
+
 			if (itemf == null) {
 				Main.i.mylib.sendError(g.player, "if_not_exists");
 				return true;
 			}
-			
+
 			g.editingRoom.itemFrameLocations[g.state % 100] = loc;
 			g.state++;
 			if (g.state == 111) {
@@ -320,29 +325,29 @@ public class AdminTools {
 			Main.i.mylib.sendError(g, "not_ingame");
 			return true;
 		}
-		
+
 		// CHECK: Room ist nicht ingame
 		if (g.joinedRoom.playing) {
 			Main.i.mylib.sendError(g, "playing");
 			return true;
 		}
-		
+
 		// CHECK: Anzahl der Argumente
 		if (args.length != 1) {
 			Main.i.mylib.sendError(g, "number_args");
 			return true;
 		}
-		
+
 		int time = MyLib.ParseInt(args[0]);
 		// CHECK: time ist gültig
 		if (time == Integer.MIN_VALUE) {
 			Main.i.mylib.sendError(g, "not_a_number");
 			return true;
 		}
-		
+
 		g.joinedRoom.waiting_time = time;
 		g.joinedRoom.onTimerOneSecond();
-		
+
 		return true;
 	}
 }

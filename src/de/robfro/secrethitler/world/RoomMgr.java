@@ -2,6 +2,8 @@ package de.robfro.secrethitler.world;
 
 import java.util.HashMap;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -61,4 +63,54 @@ public class RoomMgr {
 		room.join(g);
 	}
 	
+	// Spieler nominiert einen Spieler
+	public boolean onCommandNOMINATE(CommandSender sender, Command command, String label, String[] args) {
+		// Hole den Spieler
+		Gamer g = Main.i.mylib.getGamerFromSender(sender);
+		if (g==null)
+			return true;
+		
+		// Check: Ingame!
+		if (g.state != 1) {
+			Main.i.mylib.sendError(g, "not_ingame");
+			return true;
+		}
+		
+		// Hole den Raum
+		Room r = g.joinedRoom;
+		if (r == null)
+			return true;
+		
+		if (r.gamestate == 0) {
+			// President nominiert einen Kanzler
+			// Check: President
+			if (g != r.president) {
+				Main.i.mylib.sendError(g, "not_presd");
+				return true;
+			}
+			
+			// Check: Argument vorhanden
+			if (args.length != 1) {
+				Main.i.mylib.sendError(g, "number_args");
+				return true;
+			}
+			
+			// Hole Nominierter
+			Gamer nominee = Main.i.gamermgr.getGamer(args[0]);
+			if (nominee == null) {
+				Main.i.mylib.sendError(g, "not_a_player");
+				return true;
+			}
+			
+			// Check: Nominierter kann nominiert werden
+			if (r.canBeNominated(nominee) != 0) {
+				Main.i.mylib.sendError(g, "cant_nominated");
+				return true;
+			}
+			
+			r.nominateAsChancellor(nominee);
+		}
+		
+		return true;
+	}
 }

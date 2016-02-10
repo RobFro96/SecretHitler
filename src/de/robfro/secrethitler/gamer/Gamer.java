@@ -39,6 +39,8 @@ public class Gamer {
 	// Ingame
 	public Room joinedRoom;
 	public Role role;
+	public boolean investigated;
+	public int vote; // -1..not voted, 0..nein, 1..ja
 	
 	
 	// EchterSpieler Konstruktor
@@ -111,6 +113,12 @@ public class Gamer {
 		else
 			player.sendMessage(ChatColor.GRAY + "@" + name + ": " + ChatColor.RESET + text);
 	}
+	
+	public void sendMessage(FancyMessage msg) {
+		if (isDummy && ! master.isCurrentDummy(this))
+			Main.i.admintools.changeDummy(master, master.dummies.indexOf(this));
+		msg.send(player);
+	}
 
 	// Hole das Inventar des Spielers, gib das FakeInventar aus, wenn der Dummy
 	// angesprochen wird
@@ -143,7 +151,76 @@ public class Gamer {
 		.then(" ")
 		.then(c.getString("tr.lobby.change_longname")).color(ChatColor.AQUA).tooltip(c.getString("tr.lobby.change_tooltip").split("\\|")).command("/chgnm").send(player);
 	}
-
 	
-
+	// Sende die Nachricht über die Rolle
+	public void sendRoleMessage(ArrayList<Gamer> gamers) {
+		FileConfiguration c = Main.i.saves.config;
+		
+		String hitler = "";
+		String facists = "";
+		
+		for (Gamer g : gamers) {
+			if (g != this) {
+				if (g.role == Role.HITLER)
+					hitler = g.longName;
+				else if (g.role == Role.FACIST) {
+					if (facists != "")
+						facists += ", ";
+					facists += g.longName;						
+				}
+			}
+		}
+		
+		if (role == Role.HITLER) {
+			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_role") + c.getString("tr.pregame.rl_hitler"));
+			// Wenn 5 oder 6 Spieler weiß Hitler, wer der Facist ist
+			if (gamers.size() < 7)
+				sendMessage(ChatColor.BLUE + c.getString("tr.pregame.other_facists") + ChatColor.RESET + facists);
+		} else if (role == Role.FACIST) {
+			// Faschisten kennen immer Hitler und die anderen Faschisten
+			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_role") + c.getString("tr.pregame.rl_facist"));
+			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_fuehrer") + ChatColor.RESET + hitler);
+			// Bei 5,6 Spieler gibts es keinen anderen Faschisten
+			if (gamers.size() > 6)
+				sendMessage(ChatColor.BLUE + c.getString("tr.pregame.other_facists") + ChatColor.RESET + facists);
+		} else if (role == Role.LIBERAL) {
+			// Liberale wissen nichts
+			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_role") + c.getString("tr.pregame.rl_liberal"));
+		}
+	}
+	
+	// Der Spieler kann in Chat auswählen, welchen Kanzler er wählen will
+	public void sendChancellElectionMessage(Room r) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE + c.getString("tr.game.nominate_chancell"));
+		
+		FancyMessage msg = new FancyMessage("");
+		
+		for (Gamer g : r.gamers) {
+			msg = msg.then("[" + g.longName + "]");
+			switch (r.canBeNominated(g)) {
+			case 0:
+				msg = msg.color(ChatColor.AQUA);
+				msg = msg.command("/nominate " + g.name);
+				msg = msg.tooltip(c.getString("tr.game.nom.yes"));
+				break;
+			case 1:
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.nom.president"));
+				break;
+			case 2:
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.nom.last_chanc"));
+				break;
+			case 3:
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.nom.last_presd"));
+				break;
+			}
+			msg = msg.then("  ");
+		}
+		
+		sendMessage(msg);
+		r.gamestate = 0;
+	}
 }

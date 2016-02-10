@@ -73,10 +73,16 @@ public class Main extends JavaPlugin {
 			return gamermgr.onCommandCHGNM(sender, command, label, args);
 		case "wait":
 			return admintools.onCommandWAIT(sender, command, label, args);
+		case "nominate":
+			return rooms.onCommandNOMINATE(sender, command, label, args);
 		}
 			
 		
 		return false;
+	}
+	
+	public void delayedTask(Runnable r, long delay) {
+		getServer().getScheduler().scheduleSyncDelayedTask(this, r, delay);
 	}
 
 }
