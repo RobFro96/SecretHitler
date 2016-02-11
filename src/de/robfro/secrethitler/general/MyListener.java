@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.world.Room;
 
 public class MyListener implements Listener {
@@ -40,6 +41,13 @@ public class MyListener implements Listener {
 			if (e.getClickedBlock().getState() instanceof Sign) {
 				Main.i.rooms.onClickedSign(e);
 			}
+			Gamer g = Main.i.mylib.getGamerFromName(e.getPlayer().getName());
+			if (g != null)
+				g.onPlayerInteract(e);	
+		} else if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
+			Gamer g = Main.i.mylib.getGamerFromName(e.getPlayer().getName());
+			if (g != null)
+				g.onPlayerInteract(e);
 		}
 	}
 	

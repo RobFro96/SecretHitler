@@ -29,6 +29,7 @@ public class Room {
 	public Location[] electionTracker;
 	public Location spawn, signloc;
 	public Sign sign;
+	public String et_material1, et_material2;
 	public boolean all_right;
 
 	// Spielerbezogenene Eigenschaften
@@ -40,7 +41,7 @@ public class Room {
 	private Card[] facist_board;
 	private Card[] liberal_board;
 	private int fac_plc_placed, lib_plc_placed;
-
+	private int election_tracker;
 	public int gamestate; // 0..Nominate Chancellor
 							// 1..Wahl vergeben
 
@@ -50,7 +51,7 @@ public class Room {
 	private boolean special_election, veto_power;
 
 	// Lade einen Raum aus der YAML
-	public Room(FileConfiguration c, String key) {
+ 	public Room(FileConfiguration c, String key) {
 		name = key;
 		all_right = true;
 
@@ -99,6 +100,10 @@ public class Room {
 			Main.i.getLogger().warning("Sign is not defined in " + key + ".");
 			all_right = false;
 		}
+		
+		et_material1 = c.getString(key + ".et_material1", "35:15");
+		et_material2 = c.getString(key + ".et_material2", "35:14");
+		
 		resetRoom();
 	}
 
@@ -108,6 +113,8 @@ public class Room {
 		itemFrameLocations = new Location[ItemFrameCount];
 		electionTracker = new Location[ElectionTrackerCount];
 		spawn = null;
+		et_material1 = "35:15";
+		et_material2 = "35:14";
 
 		resetRoom();
 	}
@@ -131,6 +138,9 @@ public class Room {
 		if (signloc != null) {
 			c.set(name + ".sign", MyLib.LocationToString(signloc));
 		}
+		
+		c.set(name + ".et_material1", et_material1);
+		c.set(name + ".et_material2", et_material2);
 	}
 
 	// Beschrifte das JoinSchild neu
@@ -296,6 +306,7 @@ public class Room {
 
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
+		election_tracker = 0;
 		president = null;
 		last_president = null;
 		chancell = null;
@@ -306,6 +317,7 @@ public class Room {
 		gamestate = -1;
 
 		setItemFrames();
+		setElectionTracker();
 
 		// Vergeben der Rollen
 		setRoles();
@@ -385,6 +397,16 @@ public class Room {
 		}
 	}
 
+	// Setze die Blöcke des ElectionTrackers
+	private void setElectionTracker() {
+		for (int i=0; i<electionTracker.length; i++) {
+			if (election_tracker > i)
+				Main.i.mylib.setBlock(et_material2, electionTracker[i]);
+			else
+				Main.i.mylib.setBlock(et_material1, electionTracker[i]);
+		}
+	}
+	
 	// Errechne und setze die Rollen der einzelnen Spieler
 	private void setRoles() {
 		ArrayList<Role> list = new ArrayList<>();
@@ -498,5 +520,66 @@ public class Room {
 		// Lösche alle Wahlabgaben
 		for (Gamer g : gamers)
 			g.vote = -1;
+	}
+
+	// Wenn ein Spieler wählt, wird überprüft, ob alle abgestimmt haben.
+	public void updateVoting() {
+		for (Gamer g : gamers) {
+			if (g.vote == -1)
+				return;
+		}
+		FileConfiguration c = Main.i.saves.config;
+		
+		// Alle Spieler haben ihre Stimme abgegeben
+		gamestate = -1;
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.result"));
+		String msg = "";
+		int n = 0;
+		int jas = 0;
+		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
+		for (Gamer g : gamers) {
+			msg += ChatColor.RESET + g.longName + ": ";
+			if (g.vote == 0) 
+				msg += c.getString("tr.game.result_nein");
+			else {
+				msg += c.getString("tr.game.result_ja");
+				jas++;
+			}
+			msg += "   ";
+			n++;
+			if (n == 2) {
+				sendMessage(msg);
+				msg = "";
+				n = 0;
+			}
+		}
+		if (msg != "")
+			sendMessage(msg);
+		
+		if (jas > gamers.size() / 2) {
+			// Wahl ist angenommen
+			sendMessage(ChatColor.BLUE + c.getString("tr.game.vote_sucessf").replaceAll("#name", chancell.longName));
+			voting_sucessf();
+		} else {
+			// Wahl wurde abgelehnt
+			sendMessage(ChatColor.BLUE + c.getString("tr.game.vote_failed").replaceAll("#name", chancell.longName));
+			voting_failed();
+		}
+	}
+	
+	// Wenn die Wahl abgelehnt wurde
+	private void voting_failed() {
+		election_tracker ++;
+		setElectionTracker();
+		chancell = null;
+		
+		if (election_tracker == 3) {
+			// Der ElectionTracker ist voll, Policy aufdecken!
+		}
+	}
+	
+	//Wenn die Wahl angenommen wird
+	private void voting_sucessf() {
+		
 	}
 }

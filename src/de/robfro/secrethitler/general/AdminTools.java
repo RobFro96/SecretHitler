@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
+
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.world.Room;
@@ -83,6 +84,22 @@ public class AdminTools {
 
 			g.player.teleport(r.spawn);
 
+			return true;
+		case "vote":
+			Gamer dg = Main.i.mylib.getGamerFromName(sender.getName());
+			if (args.length < 2)
+				return true;
+			int v = MyLib.ParseInt(args[1]);
+			if (v == Integer.MIN_VALUE)
+				return true;
+			if (dg.joinedRoom == null)
+				return true;
+			if (dg.joinedRoom.gamestate != 1)
+				return true;
+			for (Gamer gam : dg.joinedRoom.gamers) {
+				gam.vote = v;
+			}
+			dg.joinedRoom.updateVoting();
 			return true;
 		}
 
@@ -181,7 +198,7 @@ public class AdminTools {
 		}
 
 		// CHECK: 2 Argumente
-		if (args.length != 2) {
+		if (args.length < 2) {
 			Main.i.mylib.sendError(sender, "number_args");
 			return true;
 		}
@@ -229,6 +246,22 @@ public class AdminTools {
 			g.state = 300;
 			g.editingRoom = r;
 			sendClickMessage(g);
+			return true;
+		case "et_material1":
+			if (args.length < 3) {
+				Main.i.mylib.sendError(g, "number_args");
+				return true;
+			}
+			g.joinedRoom.et_material1 = args[2];
+			Main.i.mylib.sendInfo(sender, "room_material");
+			return true;
+		case "et_material2":
+			if (args.length < 3) {
+				Main.i.mylib.sendError(g, "number_args");
+				return true;
+			}
+			g.joinedRoom.et_material2 = args[2];
+			Main.i.mylib.sendInfo(sender, "room_material");
 			return true;
 		}
 

@@ -73,6 +73,7 @@ public class SaveMgr {
 
 		config.addDefault("tr.info.room_created", "Der Raum wurde erfolgreich erstellt.");
 		config.addDefault("tr.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
+		config.addDefault("tr.info.room_material", "Das ElectionTracke-Material wurde erfolgreich festgelegt.");
 		config.addDefault("tr.info.room_click", "Klicke links als nächste auf: ");
 		config.addDefault("tr.info.room_if0", "ItemFrameFacists1");
 		config.addDefault("tr.info.room_if1", "ItemFrameFacists2");
@@ -127,6 +128,15 @@ public class SaveMgr {
 		config.addDefault("tr.game.nom.last_presd", "Der letzte Präsident darf nicht nominiert werden.");
 		config.addDefault("tr.game.vote", "Der Präsident schlägt #name als Kanzler vor. Bitte stimmet ab.");
 		config.addDefault("tr.game.votehelp", "Rechtsklick mit der entsprechende Wahlkarte.");
+		config.addDefault("tr.game.vote_ja", "Du stimmst für den Kanzler.");
+		config.addDefault("tr.game.vote_nein", "Du stimmst gegen den Kanzler.");
+		config.addDefault("tr.game.result", "Die Wahl ist abgeschlossen. Hier siehst du das Wahlergebnis:");
+		config.addDefault("tr.game.result_ja", ChatColor.GREEN + "JA");
+		config.addDefault("tr.game.result_nein", ChatColor.RED + "NEIN");
+		config.addDefault("tr.game.vote_sucessf", "#name wurde erfolgreich zum Kanzler gewählt.");
+		config.addDefault("tr.game.vote_failed", "#name wurde nicht gewählt.");
+		
+		config.addDefault("tr.game.cards_shuffled", "Die Politikkarten wurden neu gemischt.");
 
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");

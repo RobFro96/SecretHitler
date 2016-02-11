@@ -7,9 +7,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.game.Card;
+import de.robfro.secrethitler.game.CardType;
 import de.robfro.secrethitler.game.Role;
 import de.robfro.secrethitler.world.Room;
 import mkremins.fanciful.FancyMessage;
@@ -222,5 +225,32 @@ public class Gamer {
 		
 		sendMessage(msg);
 		r.gamestate = 0;
+	}
+
+	// Wenn ein Spieler einen Rechtsklick macht
+	public void onPlayerInteract(PlayerInteractEvent e) {
+		if (state != 1)
+			return;
+		if (joinedRoom == null)
+			return;
+		if (joinedRoom.gamestate == 1) {
+			// Es wird abgestimmt.
+			Card c = Main.i.mylib.getCardFromItemStack(e.getItem());
+			if (c == null)
+				return;
+			if (c.type != CardType.VOTE) {
+				sendMessage(ChatColor.RED + Main.i.saves.config.getString("tr.game.votehelp"));
+				return;
+			}
+			if (c == Main.i.cardmgr.cards.get("vt_ja")) {
+				vote = 1;
+				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_ja"));
+				joinedRoom.updateVoting();
+			} else if (c == Main.i.cardmgr.cards.get("vt_nein")) {
+				vote = 0;
+				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_nein"));
+				joinedRoom.updateVoting();
+			}
+		}
 	}
 }
