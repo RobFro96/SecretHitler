@@ -252,7 +252,7 @@ public class AdminTools {
 				Main.i.mylib.sendError(g, "number_args");
 				return true;
 			}
-			g.joinedRoom.et_material1 = args[2];
+			r.et_material1 = args[2];
 			Main.i.mylib.sendInfo(sender, "room_material");
 			return true;
 		case "et_material2":
@@ -260,7 +260,7 @@ public class AdminTools {
 				Main.i.mylib.sendError(g, "number_args");
 				return true;
 			}
-			g.joinedRoom.et_material2 = args[2];
+			r.et_material2 = args[2];
 			Main.i.mylib.sendInfo(sender, "room_material");
 			return true;
 		}
