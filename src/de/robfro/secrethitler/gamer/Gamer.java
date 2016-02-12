@@ -44,6 +44,7 @@ public class Gamer {
 	public Role role;
 	public boolean investigated;
 	public int vote; // -1..not voted, 0..nein, 1..ja
+	public Card[] policies;
 	
 	
 	// EchterSpieler Konstruktor
@@ -252,5 +253,10 @@ public class Gamer {
 				joinedRoom.updateVoting();
 			}
 		}
+	}
+
+	// Wenn der Präsident eine Karte vernichten soll
+	public void sendPresdDisposeMessage() {
+		
 	}
 }

@@ -66,7 +66,7 @@ public class SaveMgr {
 				"Dieser Raum kann nicht betreten werden, da dieser sich in einem Spiel befindet.");
 		config.addDefault("tr.error.room_full", "Es gibt in diesen Raum keinen freien Platz mehr.");
 		config.addDefault("tr.error.drop_item", "Items dürfen nicht fallengelassen werden.");
-		
+
 		config.addDefault("tr.error.not_presd", "Nur den Präsident darf diesen Befehl ausführen.");
 		config.addDefault("tr.error.not_a_player", "Das Argument verweist auf keinen Spieler.");
 		config.addDefault("tr.error.cant_nominated", "Dieser Spieler kann nicht nominiert werden.");
@@ -108,10 +108,10 @@ public class SaveMgr {
 		config.addDefault("tr.lobby.playing", "IM SPIEL");
 		config.addDefault("tr.lobby.join", "#name hat den Server betreten.");
 		config.addDefault("tr.lobby.quit", "#name hat dem Server verlassen.");
-		
+
 		config.addDefault("tr.waiting.join", "#name hat diesen Raum betreten.");
 		config.addDefault("tr.waiting.quit", "#name hat diesen Raum verlassen.");
-		
+
 		config.addDefault("tr.pregame.started", "Das Spiel wird gestartet.");
 		config.addDefault("tr.pregame.your_role", "Deine geheime Rolle in diesem Spiel ist: ");
 		config.addDefault("tr.pregame.rl_hitler", ChatColor.DARK_RED + "Hitler");
@@ -119,7 +119,7 @@ public class SaveMgr {
 		config.addDefault("tr.pregame.rl_liberal", ChatColor.DARK_AQUA + "Liberaler");
 		config.addDefault("tr.pregame.your_fuehrer", "Folgender Spieler ist Hitler: ");
 		config.addDefault("tr.pregame.other_facists", "Folgende Spieler spielen ebenfalls als Faschist: ");
-		
+
 		config.addDefault("tr.game.pres_was_elected", "#name wurde zum Präsidenten gewählt.");
 		config.addDefault("tr.game.nominate_chancell", "Als Präsindent musst du nun einen Kanzler nominieren.");
 		config.addDefault("tr.game.nom.yes", "Nominiere diesen Spieler.");
@@ -135,8 +135,13 @@ public class SaveMgr {
 		config.addDefault("tr.game.result_nein", ChatColor.RED + "NEIN");
 		config.addDefault("tr.game.vote_sucessf", "#name wurde erfolgreich zum Kanzler gewählt.");
 		config.addDefault("tr.game.vote_failed", "#name wurde nicht gewählt.");
-		
+
 		config.addDefault("tr.game.cards_shuffled", "Die Politikkarten wurden neu gemischt.");
+		config.addDefault("tr.game.et_full",
+				"Es kam zu drei Fehlwahlen in Folge. Deshalb wird die oberste Politik aufgedeckt und auf das Brett gelegt.");
+		config.addDefault("tr.game.presd_draws", "Der Präsindent zieht nun drei Politik-Karten und legt eine davon beseite.");
+		
+		
 
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
@@ -144,7 +149,7 @@ public class SaveMgr {
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
 		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
 		config.addDefault("tr.command.nominate", "Wird genutz, um einen Spieler zu nominieren.");
-		
+
 		config.addDefault("tr.maps.plc_liberal", "Liberale Poltik");
 		config.addDefault("tr.maps.plc_facist", "Faschistische Politik");
 		config.addDefault("tr.maps.rl_facist", "Rolle: Faschist");
@@ -156,11 +161,11 @@ public class SaveMgr {
 		config.addDefault("config.allow_chat_in_lobby", true);
 		config.addDefault("config.max_player_in_room", 10);
 		config.addDefault("config.spawnpoint", "13,22,63");
-		
+
 		config.addDefault("config.wait.min_player", 5);
 		config.addDefault("config.wait.wait_at_min", 60);
 		config.addDefault("config.wait.less_per_player", 10);
-		
+
 		config.addDefault("config.maps.plc_liberal", 100);
 		config.addDefault("config.maps.plc_facist", 101);
 		config.addDefault("config.maps.rl_facist", 102);
@@ -177,6 +182,9 @@ public class SaveMgr {
 		config.addDefault("config.maps.brd_libend", 113);
 		config.addDefault("config.maps.brd_presd", 114);
 		config.addDefault("config.maps.brd_exam", 115);
+
+		config.addDefault("config.game.liberal_plcs", 6);
+		config.addDefault("config.game.facist_plcs", 11);
 
 		config.options().copyDefaults(true);
 

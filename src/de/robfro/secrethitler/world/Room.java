@@ -13,6 +13,7 @@ import org.bukkit.entity.ItemFrame;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.game.Card;
+import de.robfro.secrethitler.game.PoliciesDeck;
 import de.robfro.secrethitler.game.Role;
 import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.general.MyLib;
@@ -40,10 +41,13 @@ public class Room {
 	// Ingame
 	private Card[] facist_board;
 	private Card[] liberal_board;
+	private PoliciesDeck deck;
 	private int fac_plc_placed, lib_plc_placed;
 	private int election_tracker;
 	public int gamestate; // 0..Nominate Chancellor
 							// 1..Wahl vergeben
+							// 2..Präsident eliminiert
+							// 3..Kanzler eliminiert
 
 	// Roles
 	public Gamer president, chancell;
@@ -51,7 +55,7 @@ public class Room {
 	private boolean special_election, veto_power;
 
 	// Lade einen Raum aus der YAML
- 	public Room(FileConfiguration c, String key) {
+	public Room(FileConfiguration c, String key) {
 		name = key;
 		all_right = true;
 
@@ -100,10 +104,10 @@ public class Room {
 			Main.i.getLogger().warning("Sign is not defined in " + key + ".");
 			all_right = false;
 		}
-		
+
 		et_material1 = c.getString(key + ".et_material1", "35:15");
 		et_material2 = c.getString(key + ".et_material2", "35:14");
-		
+
 		resetRoom();
 	}
 
@@ -138,7 +142,7 @@ public class Room {
 		if (signloc != null) {
 			c.set(name + ".sign", MyLib.LocationToString(signloc));
 		}
-		
+
 		c.set(name + ".et_material1", et_material1);
 		c.set(name + ".et_material2", et_material2);
 	}
@@ -287,8 +291,9 @@ public class Room {
 	private void start() {
 		// Sende der Konsole und allen Mitspielern die Nachricht, dass das Spiel
 		// startet.
+		FileConfiguration c = Main.i.saves.config;
 		Main.i.getLogger().info("Game started in " + name + ".");
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.pregame.started"));
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.pregame.started"));
 
 		setLevel(0, 0);
 		playing = true;
@@ -304,6 +309,7 @@ public class Room {
 		// Initialisiere das Brett
 		setBoardArrays();
 
+		deck = new PoliciesDeck(c.getInt("config.game.liberal_plcs"), c.getInt("config.game.facist_plcs"));
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
 		election_tracker = 0;
@@ -399,14 +405,14 @@ public class Room {
 
 	// Setze die Blöcke des ElectionTrackers
 	private void setElectionTracker() {
-		for (int i=0; i<electionTracker.length; i++) {
+		for (int i = 0; i < electionTracker.length; i++) {
 			if (election_tracker > i)
 				Main.i.mylib.setBlock(et_material2, electionTracker[i]);
 			else
 				Main.i.mylib.setBlock(et_material1, electionTracker[i]);
 		}
 	}
-	
+
 	// Errechne und setze die Rollen der einzelnen Spieler
 	private void setRoles() {
 		ArrayList<Role> list = new ArrayList<>();
@@ -516,7 +522,7 @@ public class Room {
 				+ c.getString("tr.game.vote").replaceAll("#name", nominee.longName));
 		sendMessage(ChatColor.BLUE.toString() + c.getString("tr.game.votehelp"));
 		gamestate = 1;
-		
+
 		// Lösche alle Wahlabgaben
 		for (Gamer g : gamers)
 			g.vote = -1;
@@ -529,7 +535,7 @@ public class Room {
 				return;
 		}
 		FileConfiguration c = Main.i.saves.config;
-		
+
 		// Alle Spieler haben ihre Stimme abgegeben
 		gamestate = -1;
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.result"));
@@ -539,7 +545,7 @@ public class Room {
 		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
 		for (Gamer g : gamers) {
 			msg += ChatColor.RESET + g.longName + ": ";
-			if (g.vote == 0) 
+			if (g.vote == 0)
 				msg += c.getString("tr.game.result_nein");
 			else {
 				msg += c.getString("tr.game.result_ja");
@@ -555,7 +561,7 @@ public class Room {
 		}
 		if (msg != "")
 			sendMessage(msg);
-		
+
 		if (jas > gamers.size() / 2) {
 			// Wahl ist angenommen
 			sendMessage(ChatColor.BLUE + c.getString("tr.game.vote_sucessf").replaceAll("#name", chancell.longName));
@@ -566,20 +572,86 @@ public class Room {
 			voting_failed();
 		}
 	}
-	
+
 	// Wenn die Wahl abgelehnt wurde
 	private void voting_failed() {
-		election_tracker ++;
+		election_tracker++;
 		setElectionTracker();
 		chancell = null;
-		
-		if (election_tracker == 3) {
-			// Der ElectionTracker ist voll, Policy aufdecken!
-		}
+
+		// Warte 5 sec
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				if (election_tracker == 3) {
+					// Der ElectionTracker ist voll, Policy aufdecken!
+					election_tracker_full();
+				} else {
+					setNewPresident();
+				}
+			}
+		}, 20 * 5);
 	}
-	
-	//Wenn die Wahl angenommen wird
+
+	private void election_tracker_full() {
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.et_full"));
+		Card c = deck.getOneCard(this, true);
+		if (c == Main.i.cardmgr.cards.get("plc_liberal"))
+			lib_plc_placed++;
+		else {
+			fac_plc_placed++;
+			if (fac_plc_placed == 3)
+				sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.warn_chancell"));
+		}
+		election_tracker = 0;
+		last_chancell = null;
+
+		setItemFrames();
+		setElectionTracker();
+
+		if (checkGameEnds(null))
+			return;
+
+		// Beginne eine neue Runde!
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				setNewPresident();				
+			}
+		}, 5*20);
+	}
+
+	// Wenn die Wahl angenommen wird
 	private void voting_sucessf() {
-		
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.presd_draws"));
+		Card[] cards = deck.getThreeCards(this);
+		for (Card  c : cards)
+			president.getInventory().addItem(c.getItemStack(true));
+		gamestate = 2;
+		president.sendPresdDisposeMessage();
+	}
+
+
+
+
+	// Überprüfe alle Möglichkeiten des Endes des Spieles
+	private boolean checkGameEnds(Gamer killed) {
+		// Wenn Hitler stirbt wird hier nicht beachtet!
+		int win = -1;
+		if (lib_plc_placed >= 5)
+			win = 0;
+		if (killed != null)
+			if (killed.role == Role.HITLER)
+				win = 0;
+		if (fac_plc_placed >= 6)
+			win = 1;
+		if (chancell != null)
+			if (chancell.role == Role.HITLER && fac_plc_placed >= 3)
+				win = 1;
+
+		if (win == -1)
+			return false;
+
+		return true;
 	}
 }
