@@ -628,11 +628,13 @@ public class Room {
 		for (Card  c : cards)
 			president.getInventory().addItem(c.getItemStack(true));
 		gamestate = 2;
-		president.sendPresdDisposeMessage();
+		president.sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.presd_discard"));
 	}
-
-
-
+	
+	// Wenn der Präsident eine Karte wegwirft
+	public void president_discard(Card c) {
+		
+	}
 
 	// Überprüfe alle Möglichkeiten des Endes des Spieles
 	private boolean checkGameEnds(Gamer killed) {

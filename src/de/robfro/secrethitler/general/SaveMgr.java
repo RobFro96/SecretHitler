@@ -140,6 +140,7 @@ public class SaveMgr {
 		config.addDefault("tr.game.et_full",
 				"Es kam zu drei Fehlwahlen in Folge. Deshalb wird die oberste Politik aufgedeckt und auf das Brett gelegt.");
 		config.addDefault("tr.game.presd_draws", "Der Präsindent zieht nun drei Politik-Karten und legt eine davon beseite.");
+		config.addDefault("tr.game.presd_discard", "Du hast drei Politik-Karten gezogen. Du musst eine davon vernichten, indem du diese mit Q aus deinen Inventar wirfst.");
 		
 		
 

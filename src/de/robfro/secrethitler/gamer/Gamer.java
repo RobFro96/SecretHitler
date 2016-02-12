@@ -254,9 +254,4 @@ public class Gamer {
 			}
 		}
 	}
-
-	// Wenn der Präsident eine Karte vernichten soll
-	public void sendPresdDisposeMessage() {
-		
-	}
 }

@@ -88,6 +88,10 @@ public class MyListener implements Listener {
 	// Player dürfen keine Items fallen lassen
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent e) {
+		if (Main.i.rooms.onPlayerDropItem(e)) {
+			e.setCancelled(true);
+			return;
+		}
 		if (e.getPlayer().hasPermission("sh.admin"))
 			return;
 		e.setCancelled(true);

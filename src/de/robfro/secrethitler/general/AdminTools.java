@@ -253,6 +253,7 @@ public class AdminTools {
 				return true;
 			}
 			r.et_material1 = args[2];
+			Main.i.rooms.save();
 			Main.i.mylib.sendInfo(sender, "room_material");
 			return true;
 		case "et_material2":
@@ -261,6 +262,7 @@ public class AdminTools {
 				return true;
 			}
 			r.et_material2 = args[2];
+			Main.i.rooms.save();
 			Main.i.mylib.sendInfo(sender, "room_material");
 			return true;
 		}

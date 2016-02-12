@@ -5,9 +5,12 @@ import java.util.HashMap;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.robfro.secrethitler.Main;
+import de.robfro.secrethitler.game.Card;
+import de.robfro.secrethitler.game.CardType;
 import de.robfro.secrethitler.gamer.Gamer;
 
 public class RoomMgr {
@@ -112,5 +115,27 @@ public class RoomMgr {
 		}
 		
 		return true;
+	}
+
+	public boolean onPlayerDropItem(PlayerDropItemEvent e) {
+		Gamer g = Main.i.mylib.getGamerFromName(e.getPlayer().getName());
+		if (g == null)
+			return false;
+		if (g.state != 1)
+			return false;
+		if (g.joinedRoom == null)
+			return false;
+		if (g.joinedRoom.gamestate == 2) {
+			// Der Präsident wirft eine Karte weg
+			if (g.joinedRoom.president != g)
+				return false;
+			Card c = Main.i.mylib.getCardFromItemStack(e.getItemDrop().getItemStack());
+			if (c == null)
+				return false;
+			if (c.type != CardType.POLICY)
+				return false;
+			
+		}
+		return false;
 	}
 }
