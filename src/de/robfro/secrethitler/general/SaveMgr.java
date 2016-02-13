@@ -138,18 +138,35 @@ public class SaveMgr {
 
 		config.addDefault("tr.game.cards_shuffled", "Die Politikkarten wurden neu gemischt.");
 		config.addDefault("tr.game.et_full",
-				"Es kam zu drei Fehlwahlen in Folge. Deshalb wird die oberste Politik aufgedeckt und auf das Brett gelegt.");
-		config.addDefault("tr.game.presd_draws", "Der Präsindent zieht nun drei Politik-Karten und legt eine davon beseite.");
-		config.addDefault("tr.game.presd_discard", "Du hast drei Politik-Karten gezogen. Du musst eine davon vernichten, indem du diese mit Q aus deinen Inventar wirfst.");
+				"Es kam zu drei Fehlwahlen in Folge. Deshalb wird die oberste Politik aufgedeckt und auf das Brett gelegt. Die presidiale Macht verfällt.");
+		config.addDefault("tr.game.presd_draws",
+				"Der Präsindent zieht nun drei Politik-Karten und vernichtet eine davon.");
+		config.addDefault("tr.game.presd_discard",
+				"Du hast drei Politik-Karten gezogen. Du musst eine davon vernichten, indem du diese mit Q aus deinen Inventar wirfst.");
+		config.addDefault("tr.game.chan_gets",
+				"Der Präsindent vernichtet eine Karte und gibt die anderen Beiden den Kanzler. Dieser muss nun entscheiden welche Politik gelegt wird.");
+		config.addDefault("tr.game.chan_discard",
+				"Du hast nun zwei Politik-Karten vom Präsidenten bekommen. Wirf eine davon mit Q aus den Inventar, um diese zu vernichten. Die andere wird gelegt.");
+		config.addDefault("tr.game.veto_power", "Du hast die Möglichkeit in Veto zu gehen: ");
+		config.addDefault("tr.game.veto", "[VETO]");
+		config.addDefault("tr.game.chan_places", "Der Kanzler hat eine Karte vernichtet und die andere auf das Brett gelegt.");
+		config.addDefault("tr.game.chanc_vetos", "Der Kanzler reicht ein Veto ein. Nun muss der Präsident bestäigen.");
+		config.addDefault("tr.game.presd_veto", "Stimmst du den Veto des Kanzlers zu, um diese Runde keine Politik zu legen? ");
+		config.addDefault("tr.game.veto_accept", "[VETO ZUSTIMMEN]");
+		config.addDefault("tr.game.veto_deny", "[VETO ABLEHNEN]");
+		config.addDefault("tr.game.accept", "Der Präsident hat das Veto angenommen. Diese Runde wird keine Karte gelegt.");
+		config.addDefault("tr.game.deny", "Der Präsident hat das Veto abgelehnt. Der Kanzler muss sich nun für eine Karte entscheiden.");
 		
 		
-
+		
+		
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
 		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
 		config.addDefault("tr.command.nominate", "Wird genutz, um einen Spieler zu nominieren.");
+		config.addDefault("tr.command.veto", "Wird genutzt, um in Veto zu gehen.");
 
 		config.addDefault("tr.maps.plc_liberal", "Liberale Poltik");
 		config.addDefault("tr.maps.plc_facist", "Faschistische Politik");

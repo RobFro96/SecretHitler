@@ -61,4 +61,8 @@ public class PoliciesDeck {
 		cards[2] = draw.get(2);
 		return cards;
 	}
+	
+	public void dicardCard(Card c) {
+		discard.add(c);
+	}
 }

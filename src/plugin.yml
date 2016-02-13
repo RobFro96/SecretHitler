@@ -17,3 +17,5 @@ commands:
     usage: '/<command> SEC'
   nominate:
     usage: '/<command> NAME'
+  veto:
+    usage: '/<command> [0|1]'

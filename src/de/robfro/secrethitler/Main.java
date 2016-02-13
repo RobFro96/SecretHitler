@@ -75,6 +75,8 @@ public class Main extends JavaPlugin {
 			return admintools.onCommandWAIT(sender, command, label, args);
 		case "nominate":
 			return rooms.onCommandNOMINATE(sender, command, label, args);
+		case "veto":
+			return rooms.onCommandVETO(sender, command, label, args);
 		}
 			
 		

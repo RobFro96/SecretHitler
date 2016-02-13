@@ -31,4 +31,14 @@ public class Card {
 		return is;
 	}
 	
+	public ItemStack getItemStack(boolean name_item, String suffix) {
+		ItemStack is = new ItemStack(Material.MAP);
+		ItemMeta im = is.getItemMeta();
+		is.setDurability((short)map_id);
+		if (item_name != null && name_item)
+			im.setDisplayName(item_name + suffix);
+		is.setItemMeta(im);
+		return is;
+	}
+	
 }

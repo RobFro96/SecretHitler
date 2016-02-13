@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.game.Card;
@@ -45,6 +46,7 @@ public class Gamer {
 	public boolean investigated;
 	public int vote; // -1..not voted, 0..nein, 1..ja
 	public Card[] policies;
+	public ArrayList<ItemStack> plcsIS;
 	
 	
 	// EchterSpieler Konstruktor

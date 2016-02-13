@@ -14,18 +14,18 @@ import de.robfro.secrethitler.game.CardType;
 import de.robfro.secrethitler.gamer.Gamer;
 
 public class RoomMgr {
-	
+
 	public HashMap<String, Room> rooms;
-	
+
 	public RoomMgr() {
 		rooms = new HashMap<>();
 		FileConfiguration c = Main.i.saves.rooms;
-		
-		for (String key: c.getKeys(false)) {
+
+		for (String key : c.getKeys(false)) {
 			rooms.put(key, new Room(c, key));
 		}
 	}
-	
+
 	// Speichern der Räume
 	public void save() {
 		for (Room r : rooms.values()) {
@@ -33,28 +33,28 @@ public class RoomMgr {
 		}
 		Main.i.saves.saveRooms();
 	}
-	
+
 	// Update alle JoinSchilder
 	public void updateAllSigns() {
 		for (Room r : rooms.values()) {
 			r.updateSign();
 		}
 	}
-	
+
 	// Wenn ein Spieler auf ein Schild klickt
 	public void onClickedSign(PlayerInteractEvent e) {
 		Gamer g = Main.i.mylib.getGamerFromSender(e.getPlayer());
-		if (g==null)
+		if (g == null)
 			return;
 		// Check: In der Lobby
 		if (g.state != 0) {
 			Main.i.mylib.sendError(g, "ingame");
 			return;
 		}
-		
+
 		Room room = null;
 		for (Room r : rooms.values()) {
-			if (r.sign.getLocation().distance(e.getClickedBlock().getLocation())<.5f) {
+			if (r.sign.getLocation().distance(e.getClickedBlock().getLocation()) < .5f) {
 				room = r;
 				break;
 			}
@@ -62,28 +62,28 @@ public class RoomMgr {
 		// CHECK: Raum wurde gefunden
 		if (room == null)
 			return;
-		
+
 		room.join(g);
 	}
-	
+
 	// Spieler nominiert einen Spieler
 	public boolean onCommandNOMINATE(CommandSender sender, Command command, String label, String[] args) {
 		// Hole den Spieler
 		Gamer g = Main.i.mylib.getGamerFromSender(sender);
-		if (g==null)
+		if (g == null)
 			return true;
-		
+
 		// Check: Ingame!
 		if (g.state != 1) {
 			Main.i.mylib.sendError(g, "not_ingame");
 			return true;
 		}
-		
+
 		// Hole den Raum
 		Room r = g.joinedRoom;
 		if (r == null)
 			return true;
-		
+
 		if (r.gamestate == 0) {
 			// President nominiert einen Kanzler
 			// Check: President
@@ -91,29 +91,29 @@ public class RoomMgr {
 				Main.i.mylib.sendError(g, "not_presd");
 				return true;
 			}
-			
+
 			// Check: Argument vorhanden
 			if (args.length != 1) {
 				Main.i.mylib.sendError(g, "number_args");
 				return true;
 			}
-			
+
 			// Hole Nominierter
 			Gamer nominee = Main.i.gamermgr.getGamer(args[0]);
 			if (nominee == null) {
 				Main.i.mylib.sendError(g, "not_a_player");
 				return true;
 			}
-			
+
 			// Check: Nominierter kann nominiert werden
 			if (r.canBeNominated(nominee) != 0) {
 				Main.i.mylib.sendError(g, "cant_nominated");
 				return true;
 			}
-			
+
 			r.nominateAsChancellor(nominee);
 		}
-		
+
 		return true;
 	}
 
@@ -134,8 +134,87 @@ public class RoomMgr {
 				return false;
 			if (c.type != CardType.POLICY)
 				return false;
-			
+			e.setCancelled(true);
+			// Warte bis das Event abgeklungen ist
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					g.joinedRoom.president_discard(c);
+				}
+			}, 5);
+		} else if (g.joinedRoom.gamestate == 3) {
+			// Der Kanzler wirft eine Karte weg
+			if (g.joinedRoom.chancell != g)
+				return false;
+			Card c = Main.i.mylib.getCardFromItemStack(e.getItemDrop().getItemStack());
+			if (c == null)
+				return false;
+			if (c.type != CardType.POLICY)
+				return false;
+			e.setCancelled(true);
+			// Warte bis das Event abgeklungen ist
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					g.joinedRoom.chanc_discard(c);
+				}
+			}, 5);
 		}
 		return false;
 	}
+
+	// Wenn der Kanzler ein Veto einreicht
+	public boolean onCommandVETO(CommandSender sender, Command command, String label, String[] args) {
+		// Hole den Spieler
+		Gamer g = Main.i.mylib.getGamerFromSender(sender);
+		if (g == null)
+			return true;
+
+		// Check: Ingame!
+		if (g.state != 1)
+			return true;
+
+		// Hole den Raum
+		Room r = g.joinedRoom;
+		if (r == null)
+			return true;
+
+		// Wenn kein Argument: Veto-Anfrage
+		if (args.length == 0) {
+			// Richtige Stelle im Spiel
+			if (r.gamestate != 3)
+				return true;
+
+			// Vetopower unlocked
+			if (!r.veto_power)
+				return true;
+
+			// Er ist der Kanzler
+			if (r.chancell != g)
+				return true;
+
+			r.chanc_veto();
+			return true;
+		} else if (args.length == 1) {
+			// Presindent beantwortet die Veto-Anfrage
+			// Richtige Stelle im Spiel
+			if (r.gamestate != 4)
+				return true;
+			
+			// Er ist President
+			if (r.president != g)
+				return true;
+			
+			if (args[0].equals("1")) {
+				r.presd_veto_accept();
+			} else {
+				r.presd_veto_deny();
+			}
+			
+			return true;
+		}
+
+		return true;
+	}
+
 }
