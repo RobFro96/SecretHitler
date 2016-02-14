@@ -96,7 +96,7 @@ public class AdminTools {
 				return true;
 			if (dg.joinedRoom.gamestate != 1)
 				return true;
-			for (Gamer gam : dg.joinedRoom.gamers) {
+			for (Gamer gam : g.dummies) {
 				gam.vote = v;
 			}
 			dg.joinedRoom.updateVoting();

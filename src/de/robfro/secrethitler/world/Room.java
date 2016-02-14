@@ -193,11 +193,13 @@ public class Room {
 		updateSign();
 		election_tracker = 0;
 		setElectionTracker();
-		
+
 		setBoardArrays(5);
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
 		setItemFrames();
+		
+		playing = false;
 	}
 
 	// Ein Spieler will diesen Raum joinen
@@ -243,6 +245,19 @@ public class Room {
 
 		if (playing) {
 			// Wenn jmd im Spiel leavt
+			if (gamers.contains(g)) {
+				gamers.remove(g);
+				checkGameEnds(g);
+				if (gamers.size() >= 3) {
+					if (g == president || g == chancell)
+						setNewPresident();
+				} else {
+					sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.end.lessplayer"));
+					openSecretRoles();
+				}
+			}
+			if (killed.contains(g))
+				killed.remove(g);
 		} else {
 			gamers.remove(g);
 			waiting_time += c.getInt("config.wait.less_per_player");
@@ -370,7 +385,7 @@ public class Room {
 		case 5:
 		case 6:
 			facist_board[0] = Main.i.cardmgr.cards.get("brd_facempty");
-			//facist_board[0] = Main.i.cardmgr.cards.get("brd_kill");
+			// facist_board[0] = Main.i.cardmgr.cards.get("brd_kill");
 			facist_board[1] = Main.i.cardmgr.cards.get("brd_facempty");
 			facist_board[2] = Main.i.cardmgr.cards.get("brd_exam");
 			facist_board[3] = Main.i.cardmgr.cards.get("brd_kill");
@@ -765,7 +780,9 @@ public class Room {
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + fc.getString("tr.game.chan_places"));
 
 		gamestate = -1;
-
+		
+		// Sonst kommt es zu einen Bug!
+		chancell = null;
 		if (checkGameEnds(null))
 			return;
 
@@ -814,6 +831,7 @@ public class Room {
 			public void run() {
 				if (election_tracker == 3) {
 					// Der ElectionTracker ist voll, Policy aufdecken!
+					chancell = null;
 					election_tracker_full();
 				} else {
 					setNewPresident();
@@ -879,6 +897,7 @@ public class Room {
 
 	// Investigate
 	public void investigate(Gamer g) {
+		gamestate = -1;
 		FileConfiguration c = Main.i.saves.config;
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
 				+ c.getString("tr.game.power.invest.invest").replaceAll("#name", g.longName));
@@ -900,6 +919,7 @@ public class Room {
 
 	// Special Election
 	public void specialElection(Gamer g) {
+		gamestate = -1;
 		// Wenn der nächste gewählt wurde, geht es normal weiter
 		if (g == nextGamer(president)) {
 			setNewPresident();
@@ -920,13 +940,13 @@ public class Room {
 
 	// Hinrichtung
 	public void executeGamer(Gamer g) {
+		gamestate = -1;
 		FileConfiguration c = Main.i.saves.config;
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
 				+ c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName));
 		gamers.remove(g);
 		killed.add(g);
 		g.state = 0;
-		g.joinedRoom = null;
 
 		if (checkGameEnds(g))
 			return;

@@ -151,6 +151,7 @@ public class RoomMgr {
 					g.joinedRoom.president_discard(c);
 				}
 			}, 5);
+			return true;
 		} else if (g.joinedRoom.gamestate == 3) {
 			// Der Kanzler wirft eine Karte weg
 			if (g.joinedRoom.chancell != g)
@@ -168,6 +169,7 @@ public class RoomMgr {
 					g.joinedRoom.chanc_discard(c);
 				}
 			}, 5);
+			return true;
 		}
 		return false;
 	}
