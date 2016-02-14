@@ -149,17 +149,58 @@ public class SaveMgr {
 				"Du hast nun zwei Politik-Karten vom Präsidenten bekommen. Wirf eine davon mit Q aus den Inventar, um diese zu vernichten. Die andere wird gelegt.");
 		config.addDefault("tr.game.veto_power", "Du hast die Möglichkeit in Veto zu gehen: ");
 		config.addDefault("tr.game.veto", "[VETO]");
-		config.addDefault("tr.game.chan_places", "Der Kanzler hat eine Karte vernichtet und die andere auf das Brett gelegt.");
+		config.addDefault("tr.game.chan_places",
+				"Der Kanzler hat eine Karte vernichtet und die andere auf das Brett gelegt.");
 		config.addDefault("tr.game.chanc_vetos", "Der Kanzler reicht ein Veto ein. Nun muss der Präsident bestäigen.");
-		config.addDefault("tr.game.presd_veto", "Stimmst du den Veto des Kanzlers zu, um diese Runde keine Politik zu legen? ");
+		config.addDefault("tr.game.presd_veto",
+				"Stimmst du den Veto des Kanzlers zu, um diese Runde keine Politik zu legen? ");
 		config.addDefault("tr.game.veto_accept", "[VETO ZUSTIMMEN]");
 		config.addDefault("tr.game.veto_deny", "[VETO ABLEHNEN]");
-		config.addDefault("tr.game.accept", "Der Präsident hat das Veto angenommen. Diese Runde wird keine Karte gelegt.");
-		config.addDefault("tr.game.deny", "Der Präsident hat das Veto abgelehnt. Der Kanzler muss sich nun für eine Karte entscheiden.");
-		
-		
-		
-		
+		config.addDefault("tr.game.accept",
+				"Der Präsident hat das Veto angenommen. Diese Runde wird keine Karte gelegt.");
+		config.addDefault("tr.game.deny",
+				"Der Präsident hat das Veto abgelehnt. Der Kanzler muss sich nun für eine Karte entscheiden.");
+
+		config.addDefault("tr.game.power.invest.info",
+				"Der Präsident kann nun die Parteiangehörigkeit eines Spielers erfahren.");
+		config.addDefault("tr.game.power.invest.who",
+				"Von welchen Spieler willst du die Parteiangehörigkeit erfahren?");
+		config.addDefault("tr.game.power.invest.this", "Wähle diesen Spieler.");
+		config.addDefault("tr.game.power.invest.you", "Du kannst dich nicht selber überprüfen.");
+		config.addDefault("tr.game.power.invest.was_invest", "Dieser Spieler wurde schon einmal überprüft.");
+		config.addDefault("tr.game.power.invest.invest", "Der Präsindent überprüft die Parteiangehörigkeit von #name.");
+		config.addDefault("tr.game.power.invest.result", "#name gehört der #party Partei an.");
+		config.addDefault("tr.game.power.invest.fac", "faschisten");
+		config.addDefault("tr.game.power.invest.lib", "liberalen");
+
+		config.addDefault("tr.game.power.presd.info", "Der Präsident darf nun den nächsten Präsidenten bestimmen.");
+		config.addDefault("tr.game.power.presd.who", "Welcher Spieler soll nächster Präsident werden?");
+		config.addDefault("tr.game.power.presd.this", "Wähle diesen Spieler.");
+		config.addDefault("tr.game.power.presd.you", "Du kannst dich nicht selber wählen.");
+
+		config.addDefault("tr.game.power.exam.info",
+				"Der Präsident kann nun die nächsten drei Politiken vom Stapel betrachten.");
+		config.addDefault("tr.game.power.exam.result", "Die nächsten drei Artikel sind: ");
+		config.addDefault("tr.game.power.exam.fac", ChatColor.RED + "[Faschistisch] ");
+		config.addDefault("tr.game.power.exam.lib", ChatColor.DARK_AQUA + "[Liberal] ");
+
+		config.addDefault("tr.game.power.veto.info", "Das Vetorecht wurde freigeschalten.");
+
+		config.addDefault("tr.game.power.kill.info", "Der Präsident muss nun einen Spieler hinrichten.");
+		config.addDefault("tr.game.power.kill.who", "Welchen Spieler soll hingerichtet werden?");
+		config.addDefault("tr.game.power.kill.this", "Wähle diesen Spieler.");
+		config.addDefault("tr.game.power.kill.you", "Du kannst dich nicht selber hinrichten lassen.");
+		config.addDefault("tr.game.power.kill.kill", "#name wurde hingerichtet.");
+
+		config.addDefault("tr.game.end.libwin", "Die liberale Partei hat das Spiel gewonnen, da ");
+		config.addDefault("tr.game.end.facwin", "Die faschistische Partei hat das Spiel gewonnen, da ");
+		config.addDefault("tr.game.end.libplcs", "fünf liberale Artikel liegen.");
+		config.addDefault("tr.game.end.killhitler", "Hitler getötet wurde.");
+		config.addDefault("tr.game.end.facplcs", "sechs liberale Artikel liegen.");
+		config.addDefault("tr.game.end.hitlerelected",
+				"Hitler zum Kanzler gewählt wurde, nachdem mindestens drei faschistische Artikel lagen.");
+		config.addDefault("tr.game.end.roles", "Hier siehst du die Rollenverteilung in diesem Spiel: ");
+
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");

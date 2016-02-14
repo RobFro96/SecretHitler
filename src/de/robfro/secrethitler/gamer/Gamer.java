@@ -35,11 +35,11 @@ public class Gamer {
 
 	// Dummy Properties:
 	public Gamer master;
-	
+
 	// Flags
 	public boolean inputLongName = false;
 	public Room editingRoom;
-	
+
 	// Ingame
 	public Room joinedRoom;
 	public Role role;
@@ -47,8 +47,8 @@ public class Gamer {
 	public int vote; // -1..not voted, 0..nein, 1..ja
 	public Card[] policies;
 	public ArrayList<ItemStack> plcsIS;
-	
-	
+
+
 	// EchterSpieler Konstruktor
 	public Gamer(Player player) {
 		this.player = player;
@@ -119,9 +119,9 @@ public class Gamer {
 		else
 			player.sendMessage(ChatColor.GRAY + "@" + name + ": " + ChatColor.RESET + text);
 	}
-	
+
 	public void sendMessage(FancyMessage msg) {
-		if (isDummy && ! master.isCurrentDummy(this))
+		if (isDummy && !master.isCurrentDummy(this))
 			Main.i.admintools.changeDummy(master, master.dummies.indexOf(this));
 		msg.send(player);
 	}
@@ -153,18 +153,19 @@ public class Gamer {
 
 		// Seriöser Name
 		new FancyMessage(c.getString("tr.lobby.current_longname"))
-		.then(longName).color(ChatColor.GRAY)
-		.then(" ")
-		.then(c.getString("tr.lobby.change_longname")).color(ChatColor.AQUA).tooltip(c.getString("tr.lobby.change_tooltip").split("\\|")).command("/chgnm").send(player);
+				.then(longName).color(ChatColor.GRAY)
+				.then(" ")
+				.then(c.getString("tr.lobby.change_longname")).color(ChatColor.AQUA)
+				.tooltip(c.getString("tr.lobby.change_tooltip").split("\\|")).command("/chgnm").send(player);
 	}
-	
+
 	// Sende die Nachricht über die Rolle
 	public void sendRoleMessage(ArrayList<Gamer> gamers) {
 		FileConfiguration c = Main.i.saves.config;
-		
+
 		String hitler = "";
 		String facists = "";
-		
+
 		for (Gamer g : gamers) {
 			if (g != this) {
 				if (g.role == Role.HITLER)
@@ -172,11 +173,11 @@ public class Gamer {
 				else if (g.role == Role.FACIST) {
 					if (facists != "")
 						facists += ", ";
-					facists += g.longName;						
+					facists += g.longName;
 				}
 			}
 		}
-		
+
 		if (role == Role.HITLER) {
 			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_role") + c.getString("tr.pregame.rl_hitler"));
 			// Wenn 5 oder 6 Spieler weiß Hitler, wer der Facist ist
@@ -194,14 +195,14 @@ public class Gamer {
 			sendMessage(ChatColor.BLUE + c.getString("tr.pregame.your_role") + c.getString("tr.pregame.rl_liberal"));
 		}
 	}
-	
+
 	// Der Spieler kann in Chat auswählen, welchen Kanzler er wählen will
 	public void sendChancellElectionMessage(Room r) {
 		FileConfiguration c = Main.i.saves.config;
 		sendMessage(ChatColor.BLUE + c.getString("tr.game.nominate_chancell"));
-		
+
 		FancyMessage msg = new FancyMessage("");
-		
+
 		for (Gamer g : r.gamers) {
 			msg = msg.then("[" + g.longName + "]");
 			switch (r.canBeNominated(g)) {
@@ -225,7 +226,7 @@ public class Gamer {
 			}
 			msg = msg.then("  ");
 		}
-		
+
 		sendMessage(msg);
 		r.gamestate = 0;
 	}
@@ -255,5 +256,74 @@ public class Gamer {
 				joinedRoom.updateVoting();
 			}
 		}
+	}
+
+	// Welcher Spieler soll investigated werden?
+	public void sendAskForInvestigation(Room r) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE + c.getString("tr.game.power.invest.who"));
+
+		FancyMessage msg = new FancyMessage("");
+
+		for (Gamer g : r.gamers) {
+			msg = msg.then("[" + g.longName + "]");
+			if (g == this) {
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.power.invest.you"));
+			} else if (g.investigated) {
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.power.invest.was_invest"));
+			} else {
+				msg = msg.color(ChatColor.AQUA);
+				msg = msg.command("/nominate " + g.name);
+				msg = msg.tooltip(c.getString("tr.game.power.invest.this"));
+			}
+			msg = msg.then("  ");
+		}
+		sendMessage(msg);
+	}
+
+	// Welcher Spieler soll nächster President werden?
+	public void sendAskForNextPresd(Room r) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE + c.getString("tr.game.power.presd.who"));
+
+		FancyMessage msg = new FancyMessage("");
+
+		for (Gamer g : r.gamers) {
+			msg = msg.then("[" + g.longName + "]");
+			if (g == this) {
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.power.invest.you"));
+			} else {
+				msg = msg.color(ChatColor.AQUA);
+				msg = msg.command("/nominate " + g.name);
+				msg = msg.tooltip(c.getString("tr.game.power.invest.this"));
+			}
+			msg = msg.then("  ");
+		}
+		sendMessage(msg);
+	}
+
+	// Welcher Spieler soll hingerichtet werden?
+	public void sendAskToExecute(Room r) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE + c.getString("tr.game.power.kill.who"));
+
+		FancyMessage msg = new FancyMessage("");
+
+		for (Gamer g : r.gamers) {
+			msg = msg.then("[" + g.longName + "]");
+			if (g == this) {
+				msg = msg.color(ChatColor.GRAY);
+				msg = msg.tooltip(c.getString("tr.game.power.kill.you"));
+			} else {
+				msg = msg.color(ChatColor.AQUA);
+				msg = msg.command("/nominate " + g.name);
+				msg = msg.tooltip(c.getString("tr.game.power.kill.this"));
+			}
+			msg = msg.then("  ");
+		}
+		sendMessage(msg);
 	}
 }

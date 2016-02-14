@@ -74,44 +74,53 @@ public class RoomMgr {
 			return true;
 
 		// Check: Ingame!
-		if (g.state != 1) {
-			Main.i.mylib.sendError(g, "not_ingame");
-			return true;
-		}
+		if (g.state != 1) return true;
 
 		// Hole den Raum
 		Room r = g.joinedRoom;
-		if (r == null)
-			return true;
+		if (r == null) return true;
+
+		// Check: Argument vorhanden
+		if (args.length != 1) return true;
+
+		// Hole Nominierter
+		Gamer nominee = Main.i.gamermgr.getGamer(args[0]);
+		if (nominee == null) return true;
+
 
 		if (r.gamestate == 0) {
 			// President nominiert einen Kanzler
 			// Check: President
-			if (g != r.president) {
-				Main.i.mylib.sendError(g, "not_presd");
-				return true;
-			}
-
-			// Check: Argument vorhanden
-			if (args.length != 1) {
-				Main.i.mylib.sendError(g, "number_args");
-				return true;
-			}
-
-			// Hole Nominierter
-			Gamer nominee = Main.i.gamermgr.getGamer(args[0]);
-			if (nominee == null) {
-				Main.i.mylib.sendError(g, "not_a_player");
-				return true;
-			}
+			if (g != r.president) return true;
 
 			// Check: Nominierter kann nominiert werden
-			if (r.canBeNominated(nominee) != 0) {
-				Main.i.mylib.sendError(g, "cant_nominated");
-				return true;
-			}
+			if (r.canBeNominated(nominee) != 0) return true;
 
 			r.nominateAsChancellor(nominee);
+		} else if (r.gamestate == 5) {
+			// Who to invest
+			// Check: President
+			if (g != r.president) return true;
+			
+			if (nominee == g || nominee.investigated) return true;
+			
+			r.investigate(nominee);
+		} else if (r.gamestate == 6) {
+			// Wer nächster President?
+			// Check: President
+			if (g != r.president) return true;
+			
+			if (nominee == g) return true;
+			
+			r.specialElection(nominee);
+		} else if (r.gamestate == 7) {
+			// Wer soll hingerichtet werden?
+			// Check: President
+			if (g != r.president) return true;
+			
+			if (nominee == g) return true;
+			
+			r.executeGamer(nominee);
 		}
 
 		return true;
@@ -200,17 +209,17 @@ public class RoomMgr {
 			// Richtige Stelle im Spiel
 			if (r.gamestate != 4)
 				return true;
-			
+
 			// Er ist President
 			if (r.president != g)
 				return true;
-			
+
 			if (args[0].equals("1")) {
 				r.presd_veto_accept();
 			} else {
 				r.presd_veto_deny();
 			}
-			
+
 			return true;
 		}
 

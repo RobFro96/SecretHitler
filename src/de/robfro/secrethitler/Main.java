@@ -34,11 +34,10 @@ public class Main extends JavaPlugin {
 		admintools = new AdminTools();
 		saves = new SaveMgr();
 		mylib = new MyLib();
-		rooms = new RoomMgr();
 		gamermgr = new GamerMgr();
 		gamermgr.onPluginEnabled();
 		cardmgr = new CardMgr();
-		
+		rooms = new RoomMgr();
 		// Starte den Listener
 		listener = new MyListener();
 		getServer().getPluginManager().registerEvents(listener, this);

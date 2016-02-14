@@ -37,6 +37,7 @@ public class Room {
 
 	// Spielerbezogenene Eigenschaften
 	public ArrayList<Gamer> gamers;
+	public ArrayList<Gamer> killed;
 	public boolean playing = false;
 	public int waiting_time;
 
@@ -51,6 +52,9 @@ public class Room {
 							// 2..Präsident eliminiert
 							// 3..Kanzler eliminiert, veto
 							// 4..Präsident bestätigt veto
+							// 5..welchen Spieler investen?
+							// 6..welchen Spieler zum Presidentn wählen?
+							// 7..welchen Spieler exicuten?
 
 	// Roles
 	public Gamer president, chancell;
@@ -173,9 +177,13 @@ public class Room {
 		// Entfernt Spieler, wenn vorhanden
 		if (gamers != null) {
 			for (Gamer g : gamers) {
-				g.getInventory().clear();
-				g.state = 0;
-				g.joinedRoom = null;
+				if (g.state != 0) {
+					g.getInventory().clear();
+					g.state = 0;
+					g.joinedRoom = null;
+					if (!g.isDummy)
+						g.player.teleport(Main.i.saves.spawnPoint);
+				}
 			}
 		}
 
@@ -183,6 +191,13 @@ public class Room {
 		waiting_time = Main.i.saves.config.getInt("config.wait.wait_at_min");
 
 		updateSign();
+		election_tracker = 0;
+		setElectionTracker();
+		
+		setBoardArrays(5);
+		fac_plc_placed = 0;
+		lib_plc_placed = 0;
+		setItemFrames();
 	}
 
 	// Ein Spieler will diesen Raum joinen
@@ -311,8 +326,9 @@ public class Room {
 		}
 
 		// Initialisiere das Brett
-		setBoardArrays();
+		setBoardArrays(gamers.size());
 
+		killed = new ArrayList<>();
 		deck = new PoliciesDeck(c.getInt("config.game.liberal_plcs"), c.getInt("config.game.facist_plcs"));
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
@@ -321,7 +337,7 @@ public class Room {
 		last_president = null;
 		chancell = null;
 		last_chancell = null;
-		veto_power = true;
+		veto_power = false;
 		special_election = false;
 
 		gamestate = -1;
@@ -348,12 +364,13 @@ public class Room {
 	}
 
 	// Errechnet das facist_board-Array
-	private void setBoardArrays() {
+	private void setBoardArrays(int size) {
 		facist_board = new Card[6];
-		switch (gamers.size()) {
+		switch (size) {
 		case 5:
 		case 6:
 			facist_board[0] = Main.i.cardmgr.cards.get("brd_facempty");
+			//facist_board[0] = Main.i.cardmgr.cards.get("brd_kill");
 			facist_board[1] = Main.i.cardmgr.cards.get("brd_facempty");
 			facist_board[2] = Main.i.cardmgr.cards.get("brd_exam");
 			facist_board[3] = Main.i.cardmgr.cards.get("brd_kill");
@@ -405,7 +422,7 @@ public class Room {
 			else
 				itmf.setItem(liberal_board[i].getItemStack(false));
 		}
-		
+
 		// Setze die Veto-Power
 		if (fac_plc_placed >= 5)
 			veto_power = true;
@@ -475,9 +492,11 @@ public class Room {
 	// Bestimmt den neuen Presidenten
 	private void setNewPresident() {
 		// Übertrage den Kanzler
-		if (chancell != null)
+		if (chancell != null) {
 			last_chancell = chancell;
-		
+			chancell = null;
+		}
+
 		if (special_election) {
 			// Wenn es zu eine SpecialElection kam, muss der nächste nach den
 			// President zuvor genommen werden
@@ -608,9 +627,9 @@ public class Room {
 	private void election_tracker_full() {
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.et_full"));
 		Card c = deck.getOneCard(this, true);
-		
+
 		placeCard(c);
-		
+
 		election_tracker = 0;
 		last_chancell = null;
 
@@ -623,9 +642,9 @@ public class Room {
 		Main.i.delayedTask(new Runnable() {
 			@Override
 			public void run() {
-				setNewPresident();				
+				setNewPresident();
 			}
-		}, 5*20);
+		}, 5 * 20);
 	}
 
 	// Lege eine Karte auf das Brett, checkEndGame muss noch gemacht werden!
@@ -639,37 +658,37 @@ public class Room {
 		}
 		setItemFrames();
 	}
-	
+
 	// Wenn die Wahl angenommen wird
 	private void voting_sucessf() {
 		// Check: Spiel zu ende durch die Wahl von Hitler
 		if (checkGameEnds(null))
 			return;
-		
+
 		// Setze den ET zurück
 		election_tracker = 0;
 		setElectionTracker();
-		
+
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.presd_draws"));
 		Card[] cards = deck.getThreeCards(this);
 		giveGamerCards(president, cards);
 		gamestate = 2;
 		president.sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.presd_discard"));
 	}
-	
+
 	// Gebe die Spieler Karten, trage diese in policies und plcsIS ein
 	private void giveGamerCards(Gamer g, Card[] cards) {
 		g.plcsIS = new ArrayList<>();
 		g.policies = cards;
 		String spcs = "";
-		for (Card  c : cards) {
+		for (Card c : cards) {
 			ItemStack is = c.getItemStack(true, spcs);
 			spcs += " ";
 			g.getInventory().addItem(is);
 			g.plcsIS.add(is);
 		}
 	}
-	
+
 	// Entferne alle Karten den Spielers
 	private void removerGamerCards(Gamer g) {
 		for (ItemStack is : g.plcsIS) {
@@ -678,18 +697,18 @@ public class Room {
 		g.policies = null;
 		g.plcsIS = null;
 	}
-	
+
 	// Wenn der Präsident eine Karte wegwirft
 	public void president_discard(Card c) {
 		FileConfiguration fc = Main.i.saves.config;
-		
+
 		// Entferne alle Policies aus den Inventar des Präsidenten
 		Card[] cards = president.policies;
-		removerGamerCards(president);	
-		
+		removerGamerCards(president);
+
 		// Lege die Karte auf den Discard-Stapel
 		deck.dicardCard(c);
-		
+
 		// Gebe den Kanzler die überigen 2
 		Card[] newCards = new Card[2];
 		int i = 0;
@@ -698,18 +717,18 @@ public class Room {
 			if (weg || card != c) {
 				newCards[i] = card;
 				i++;
-			} else 
+			} else
 				weg = true;
 		}
-		
+
 		giveGamerCards(chancell, newCards);
-		
+
 		// Informiere die Spieler
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + fc.getString("tr.game.chan_gets"));
-		
+
 		// Informiere den Kanzler
 		Main.i.delayedTask(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				chancell.sendMessage(ChatColor.BLUE + fc.getString("tr.game.chan_discard"));
@@ -721,58 +740,66 @@ public class Room {
 				chancell.sendMessage(vetomsg);
 			}
 		}, 5);
-		
+
 		gamestate = 3;
 	}
 
 	// Wenn der Kanzler eine Karte wegwirft
 	public void chanc_discard(Card remc) {
 		FileConfiguration fc = Main.i.saves.config;
-		
+
 		Card setc = chancell.policies[0];
 		if (setc == remc)
 			setc = chancell.policies[1];
-		
+
 		// Entferne alle Karten
 		removerGamerCards(chancell);
-		
+
 		// Lege die entfernte auf den Discard-Stapel
 		deck.dicardCard(remc);
-		
+
 		// Lege die andere auf das Board
 		int fac_placed_before = fac_plc_placed;
 		placeCard(setc);
-		
+
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + fc.getString("tr.game.chan_places"));
-		
+
 		gamestate = -1;
-		
+
 		if (checkGameEnds(null))
 			return;
-		
+
 		if (fac_placed_before != fac_plc_placed) {
 			// Es wurde eine faschistische Karte gelegt
 			checkPresidentialPower();
+		} else {
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					setNewPresident();
+				}
+			}, 20 * 5);
 		}
 	}
-	
+
 	// Wenn der Kanzler auf den Veto-Button drückt
 	public void chanc_veto() {
 		FileConfiguration c = Main.i.saves.config;
-		
+
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.chanc_vetos"));
-		
+
 		president.sendMessage(ChatColor.BLUE + c.getString("tr.game.presd_veto"));
-		
-		FancyMessage msg = new FancyMessage(c.getString("tr.game.veto_accept")).color(ChatColor.AQUA).command("/veto 1");
+
+		FancyMessage msg = new FancyMessage(c.getString("tr.game.veto_accept")).color(ChatColor.AQUA)
+				.command("/veto 1");
 		msg = msg.then("   ");
 		msg = msg.then(c.getString("tr.game.veto_deny")).color(ChatColor.AQUA).command("/veto 0");
-		
+
 		president.sendMessage(msg);
-		
+
 		gamestate = 4;
 	}
-	
+
 	// Die Antwort des Präsidenten
 	public void presd_veto_accept() {
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.accept"));
@@ -780,7 +807,7 @@ public class Room {
 		setElectionTracker();
 
 		gamestate = -1;
-		
+
 		// Warte 5 sec
 		Main.i.delayedTask(new Runnable() {
 			@Override
@@ -798,38 +825,208 @@ public class Room {
 		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.deny"));
 		gamestate = 3;
 	}
-	
-	// Wenn eine faschitische Karte gelegt wird, wird die presidential power überprüft
+
+	// Wenn eine faschitische Karte gelegt wird, wird die presidential power
+	// überprüft
 	private void checkPresidentialPower() {
-		Card c = facist_board[fac_plc_placed];
-		if (c == Main.i.cardmgr.cards.get("brd_invest")) {
-			
+		FileConfiguration c = Main.i.saves.config;
+		Card card = facist_board[fac_plc_placed - 1];
+		if (card == Main.i.cardmgr.cards.get("brd_invest")) {
+			// Die Parteiangehörigkeit eines Spielers erfragen
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.invest.info"));
+			president.sendAskForInvestigation(this);
+			gamestate = 5;
+		} else if (card == Main.i.cardmgr.cards.get("brd_presd")) {
+			// Den nächsten Präsidenten wählen
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.presd.info"));
+			president.sendAskForNextPresd(this);
+			gamestate = 6;
+		} else if (card == Main.i.cardmgr.cards.get("brd_exam")) {
+			// Die nächsten drei Poltiken betrachten
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.exam.info"));
+			String cards = "";
+			for (Card plc : deck.showThreeCards()) {
+				if (plc == Main.i.cardmgr.cards.get("plc_liberal"))
+					cards += c.getString("tr.game.power.exam.lib");
+				else
+					cards += c.getString("tr.game.power.exam.fac");
+			}
+
+			president.sendMessage(ChatColor.BLUE + c.getString("tr.game.power.exam.result") + cards);
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					setNewPresident();
+				}
+			}, 20 * 5);
+		} else if (card == Main.i.cardmgr.cards.get("brd_kill") || card == Main.i.cardmgr.cards.get("brd_veto")) {
+			// Töte einen Spieler
+			if (card == Main.i.cardmgr.cards.get("brd_veto"))
+				sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.veto.info"));
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.kill.info"));
+			president.sendAskToExecute(this);
+			gamestate = 7;
+		} else {
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					setNewPresident();
+				}
+			}, 20 * 5);
 		}
-		else {
-			setNewPresident();
-		}
-		
+
 	}
-	
+
+	// Investigate
+	public void investigate(Gamer g) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
+				+ c.getString("tr.game.power.invest.invest").replaceAll("#name", g.longName));
+
+		String party = c.getString("tr.game.power.invest.lib");
+		if (g.role == Role.HITLER || g.role == Role.FACIST)
+			party = c.getString("tr.game.power.invest.fac");
+
+		president.sendMessage(ChatColor.BLUE
+				+ c.getString("tr.game.power.invest.result").replaceAll("#name", g.name).replaceAll("#party", party));
+
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				setNewPresident();
+			}
+		}, 20 * 5);
+	}
+
+	// Special Election
+	public void specialElection(Gamer g) {
+		// Wenn der nächste gewählt wurde, geht es normal weiter
+		if (g == nextGamer(president)) {
+			setNewPresident();
+			return;
+		}
+
+		// Manipuliere alles
+		special_election = true;
+		last_chancell = chancell;
+		chancell = null;
+		last_president = president;
+		president = g;
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
+				+ Main.i.saves.config.getString("tr.game.pres_was_elected").replaceAll("#name", president.longName));
+
+		president.sendChancellElectionMessage(this);
+	}
+
+	// Hinrichtung
+	public void executeGamer(Gamer g) {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
+				+ c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName));
+		gamers.remove(g);
+		killed.add(g);
+		g.state = 0;
+		g.joinedRoom = null;
+
+		if (checkGameEnds(g))
+			return;
+
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				setNewPresident();
+			}
+		}, 20 * 5);
+
+
+	}
+
 	// Überprüfe alle Möglichkeiten des Endes des Spieles
 	private boolean checkGameEnds(Gamer killed) {
 		// Wenn Hitler stirbt wird hier nicht beachtet!
+		FileConfiguration c = Main.i.saves.config;
 		int win = -1;
-		if (lib_plc_placed >= 5)
+		String cause = "";
+		if (lib_plc_placed >= 5) {
 			win = 0;
-		if (killed != null)
-			if (killed.role == Role.HITLER)
+			cause = c.getString("tr.game.end.libplcs");
+		}
+		if (killed != null) {
+			if (killed.role == Role.HITLER) {
 				win = 0;
-		if (fac_plc_placed >= 6)
+				cause = c.getString("tr.game.end.killhitler");
+			}
+		}
+		if (fac_plc_placed >= 6) {
 			win = 1;
-		if (chancell != null)
-			if (chancell.role == Role.HITLER && fac_plc_placed >= 3)
+			cause = c.getString("tr.game.end.facplcs");
+		}
+		if (chancell != null) {
+			if (chancell.role == Role.HITLER && fac_plc_placed >= 3) {
 				win = 1;
+				cause = c.getString("tr.game.end.hitlerelected");
+			}
+		}
 
 		if (win == -1)
 			return false;
 
+		gamers.addAll(this.killed);
+		if (win == 0) {
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
+					+ c.getString("tr.game.end.libwin") + cause);
+		} else {
+			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
+					+ c.getString("tr.game.end.libwin") + cause);
+		}
+
+		Main.i.getLogger().info("Game started in " + name + ".");
+
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				openSecretRoles();
+			}
+		}, 20 * 5);
+
+
 		return true;
+	}
+
+	private void openSecretRoles() {
+		FileConfiguration c = Main.i.saves.config;
+		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.end.roles"));
+		String msg = "";
+		int n = 0;
+
+		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
+		for (Gamer g : gamers) {
+			msg += ChatColor.RESET + g.longName + ": ";
+			if (g.role == Role.FACIST)
+				msg += c.getString("tr.pregame.rl_facist");
+			else if (g.role == Role.HITLER)
+				msg += c.getString("tr.pregame.rl_hitler");
+			else
+				msg += c.getString("tr.pregame.rl_liberal");
+
+			msg += "   ";
+			n++;
+			if (n == 2) {
+				sendMessage(msg);
+				msg = "";
+				n = 0;
+			}
+		}
+		if (msg != "")
+			sendMessage(msg);
+
+		// Beende das Spiel
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				resetRoom();
+			}
+		}, 20 * 5);
 	}
 
 }
