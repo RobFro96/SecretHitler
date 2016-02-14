@@ -44,7 +44,7 @@ public class MyListener implements Listener {
 			Gamer g = Main.i.mylib.getGamerFromName(e.getPlayer().getName());
 			if (g != null)
 				g.onPlayerInteract(e);	
-		} else if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
+		} else if (e.getAction() == Action.RIGHT_CLICK_AIR) {
 			Gamer g = Main.i.mylib.getGamerFromName(e.getPlayer().getName());
 			if (g != null)
 				g.onPlayerInteract(e);
