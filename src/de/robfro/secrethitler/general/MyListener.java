@@ -55,6 +55,9 @@ public class MyListener implements Listener {
 	public void onHangingBreak(HangingBreakByEntityEvent e) {
 		if (e.getRemover() instanceof Player)
 			e.setCancelled(Main.i.admintools.onPlayerClickBlock((Player)e.getRemover(), e.getEntity().getLocation()));
+		if (e.getRemover().hasPermission("sh.admin"))
+			return;
+		e.setCancelled(true);
 	}
 	
 	@EventHandler

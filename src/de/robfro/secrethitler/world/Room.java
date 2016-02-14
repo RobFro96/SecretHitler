@@ -64,6 +64,7 @@ public class Room {
 
 	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
+		gamers = new ArrayList<>();
 		name = key;
 		all_right = true;
 
@@ -189,17 +190,16 @@ public class Room {
 
 		gamers = new ArrayList<>();
 		waiting_time = Main.i.saves.config.getInt("config.wait.wait_at_min");
-
-		updateSign();
 		election_tracker = 0;
-		setElectionTracker();
-
 		setBoardArrays(5);
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
-		setItemFrames();
-		
 		playing = false;
+		
+		
+		setElectionTracker();
+		setItemFrames();
+		updateSign();
 	}
 
 	// Ein Spieler will diesen Raum joinen
@@ -247,13 +247,15 @@ public class Room {
 			// Wenn jmd im Spiel leavt
 			if (gamers.contains(g)) {
 				gamers.remove(g);
-				checkGameEnds(g);
+				checkGameEnds(g, false);
 				if (gamers.size() >= 3) {
 					if (g == president || g == chancell)
 						setNewPresident();
-				} else {
+				} else if (gamers.size() == 2 ){
 					sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.end.lessplayer"));
 					openSecretRoles();
+				} else {
+					resetRoom();
 				}
 			}
 			if (killed.contains(g))
@@ -650,7 +652,7 @@ public class Room {
 
 		setElectionTracker();
 
-		if (checkGameEnds(null))
+		if (checkGameEnds(null, true))
 			return;
 
 		// Beginne eine neue Runde!
@@ -677,7 +679,7 @@ public class Room {
 	// Wenn die Wahl angenommen wird
 	private void voting_sucessf() {
 		// Check: Spiel zu ende durch die Wahl von Hitler
-		if (checkGameEnds(null))
+		if (checkGameEnds(null, false))
 			return;
 
 		// Setze den ET zurück
@@ -781,9 +783,7 @@ public class Room {
 
 		gamestate = -1;
 		
-		// Sonst kommt es zu einen Bug!
-		chancell = null;
-		if (checkGameEnds(null))
+		if (checkGameEnds(null, true))
 			return;
 
 		if (fac_placed_before != fac_plc_placed) {
@@ -948,7 +948,7 @@ public class Room {
 		killed.add(g);
 		g.state = 0;
 
-		if (checkGameEnds(g))
+		if (checkGameEnds(g, true))
 			return;
 
 		Main.i.delayedTask(new Runnable() {
@@ -962,7 +962,7 @@ public class Room {
 	}
 
 	// Überprüfe alle Möglichkeiten des Endes des Spieles
-	private boolean checkGameEnds(Gamer killed) {
+	private boolean checkGameEnds(Gamer killed, boolean ignoreHitler) {
 		// Wenn Hitler stirbt wird hier nicht beachtet!
 		FileConfiguration c = Main.i.saves.config;
 		int win = -1;
@@ -981,7 +981,7 @@ public class Room {
 			win = 1;
 			cause = c.getString("tr.game.end.facplcs");
 		}
-		if (chancell != null) {
+		if (chancell != null && !ignoreHitler) {
 			if (chancell.role == Role.HITLER && fac_plc_placed >= 3) {
 				win = 1;
 				cause = c.getString("tr.game.end.hitlerelected");
@@ -997,7 +997,7 @@ public class Room {
 					+ c.getString("tr.game.end.libwin") + cause);
 		} else {
 			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-					+ c.getString("tr.game.end.libwin") + cause);
+					+ c.getString("tr.game.end.facwin") + cause);
 		}
 
 		Main.i.getLogger().info("Game started in " + name + ".");

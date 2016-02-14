@@ -201,7 +201,9 @@ public class SaveMgr {
 				"Hitler zum Kanzler gewählt wurde, nachdem mindestens drei faschistische Artikel lagen.");
 		config.addDefault("tr.game.end.roles", "Hier siehst du die Rollenverteilung in diesem Spiel: ");
 		config.addDefault("tr.game.end.lessplayer", "Das Spiel musste beendet werden, da zu wenige Spieler noch da sind.");
+		config.addDefault("tr.game.warn_chancell", "Achtung! Es liegen drei Faschistische Artikel. Sollte nun Hitler zum Kanzler gewählt werden, so kommt es zur Machtergreifung.");
 
+		
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
