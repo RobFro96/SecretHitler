@@ -138,7 +138,7 @@ public class GamerMgr {
 		} else if (g.state == 1) {
 			if (g.joinedRoom == null)
 				return;
-			g.joinedRoom.sendMessage("<" + g.longName + "> " + e.getMessage());
+			g.joinedRoom.sendMessage("<" + g.longName + "> " + e.getMessage(), ChatColor.WHITE);
 		}
 	}
 	

@@ -182,6 +182,8 @@ public class MyLib {
 	}
 
 	public Card getCardFromItemStack(ItemStack is) {
+		if (is == null)
+			return null;
 		if (is.getType() != Material.MAP)
 			return null;
 		for (Card c : Main.i.cardmgr.cards.values()) {

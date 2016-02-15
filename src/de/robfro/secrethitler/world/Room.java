@@ -195,8 +195,8 @@ public class Room {
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
 		playing = false;
-		
-		
+
+
 		setElectionTracker();
 		setItemFrames();
 		updateSign();
@@ -223,8 +223,7 @@ public class Room {
 		g.state = 1;
 		g.joinedRoom = this;
 		gamers.add(g);
-		sendMessage(
-				ChatColor.YELLOW + Main.i.saves.config.getString("tr.waiting.join").replaceAll("#name", g.longName));
+		sendMessage(Main.i.saves.config.getString("tr.waiting.join").replaceAll("#name", g.longName), ChatColor.YELLOW);
 
 		if (!g.isDummy)
 			g.player.teleport(spawn);
@@ -240,8 +239,7 @@ public class Room {
 	public void quit(Gamer g) {
 		FileConfiguration c = Main.i.saves.config;
 
-		sendMessage(
-				ChatColor.YELLOW + Main.i.saves.config.getString("tr.waiting.quit").replaceAll("#name", g.longName));
+		sendMessage(Main.i.saves.config.getString("tr.waiting.quit").replaceAll("#name", g.longName), ChatColor.YELLOW);
 
 		if (playing) {
 			// Wenn jmd im Spiel leavt
@@ -251,8 +249,8 @@ public class Room {
 				if (gamers.size() >= 3) {
 					if (g == president || g == chancell)
 						setNewPresident();
-				} else if (gamers.size() == 2 ){
-					sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.end.lessplayer"));
+				} else if (gamers.size() == 2) {
+					sendMessage(c.getString("tr.game.end.lessplayer"), ChatColor.BLUE, true);
 					openSecretRoles();
 				} else {
 					resetRoom();
@@ -270,9 +268,33 @@ public class Room {
 	}
 
 	// Sendet eine Nachricht an alle Spieler in diesem Raum
-	public void sendMessage(String msg) {
+	public void sendMessage(String msg, ChatColor color) {
+		sendMessage(msg, color, false);
+	}
+
+	public void sendMessage(String msg, ChatColor color, boolean bold) {
+		msg = formatMessage(msg, color, bold);
 		for (Gamer g : gamers)
 			g.sendMessage(msg);
+	}
+
+	public void clearChat() {
+		for (Gamer g : gamers)
+			for (int i=0; i<3; i++)
+				g.sendMessage(" ");
+	}
+	
+	public String formatMessage(String msg, ChatColor color, boolean bold) {
+		FileConfiguration c = Main.i.saves.config;
+		String clr = color.toString();
+		if (bold)
+			clr += ChatColor.BOLD.toString();
+		msg = clr + msg;
+		if (president != null)
+			msg = msg.replaceAll("#prnm", c.getString("config.game.presd_color") + president.longName + clr);
+		if (chancell != null)
+			msg = msg.replaceAll("#chnm", c.getString("config.game.chanc_color") + chancell.longName + clr);
+		return msg;
 	}
 
 	// Nach einer Sekunde wird wird die Zeit verringert
@@ -329,7 +351,7 @@ public class Room {
 		// startet.
 		FileConfiguration c = Main.i.saves.config;
 		Main.i.getLogger().info("Game started in " + name + ".");
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.pregame.started"));
+		sendMessage(c.getString("tr.pregame.started"), ChatColor.BLUE, true);
 
 		setLevel(0, 0);
 		playing = true;
@@ -366,6 +388,8 @@ public class Room {
 		setRoles();
 		giveRoleCards();
 
+		clearChat();
+		
 		// Sende die Nachricht an alle Spieler
 		for (Gamer g : gamers)
 			g.sendRoleMessage(gamers);
@@ -482,7 +506,7 @@ public class Room {
 		while (list.size() < gamers.size())
 			list.add(Role.LIBERAL);
 
-		Collections.shuffle(list);
+		Collections.shuffle(list, new Random(System.nanoTime()));
 
 		for (int i = 0; i < gamers.size(); i++) {
 			gamers.get(i).role = list.get(i);
@@ -523,15 +547,14 @@ public class Room {
 			president = next;
 		} else if (president == null) {
 			// Wenn das Spiel neu gestartet wurde, wird der President gelost
-			president = gamers.get(new Random().nextInt(gamers.size()));
+			president = gamers.get(new Random(System.nanoTime()).nextInt(gamers.size()));
 		} else {
 			Gamer next = nextGamer(president);
 			last_president = president;
 			president = next;
 		}
 
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-				+ Main.i.saves.config.getString("tr.game.pres_was_elected").replaceAll("#name", president.longName));
+		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
 
 		president.sendChancellElectionMessage(this);
 	}
@@ -564,11 +587,12 @@ public class Room {
 
 	// Wenn der Pres. einen Kanzler nominiert werden alle zur Wahl aufgerufen
 	public void nominateAsChancellor(Gamer nominee) {
+		clearChat();
+		
 		chancell = nominee;
 		FileConfiguration c = Main.i.saves.config;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-				+ c.getString("tr.game.vote").replaceAll("#name", nominee.longName));
-		sendMessage(ChatColor.BLUE.toString() + c.getString("tr.game.votehelp"));
+		sendMessage(c.getString("tr.game.vote"), ChatColor.BLUE, true);
+		sendMessage(c.getString("tr.game.votehelp"), ChatColor.BLUE);
 		gamestate = 1;
 
 		// Lösche alle Wahlabgaben
@@ -583,10 +607,12 @@ public class Room {
 				return;
 		}
 		FileConfiguration c = Main.i.saves.config;
-
+		
+		clearChat();
+		
 		// Alle Spieler haben ihre Stimme abgegeben
 		gamestate = -1;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.result"));
+		sendMessage(c.getString("tr.game.result"), ChatColor.BLUE, true);
 		String msg = "";
 		int n = 0;
 		int jas = 0;
@@ -602,21 +628,21 @@ public class Room {
 			msg += "   ";
 			n++;
 			if (n == 2) {
-				sendMessage(msg);
+				sendMessage(msg, ChatColor.WHITE);
 				msg = "";
 				n = 0;
 			}
 		}
 		if (msg != "")
-			sendMessage(msg);
+			sendMessage(msg, ChatColor.WHITE);
 
 		if (jas > gamers.size() / 2) {
 			// Wahl ist angenommen
-			sendMessage(ChatColor.BLUE + c.getString("tr.game.vote_sucessf").replaceAll("#name", chancell.longName));
+			sendMessage(c.getString("tr.game.vote_sucessf"), ChatColor.BLUE);
 			voting_sucessf();
 		} else {
 			// Wahl wurde abgelehnt
-			sendMessage(ChatColor.BLUE + c.getString("tr.game.vote_failed").replaceAll("#name", chancell.longName));
+			sendMessage(c.getString("tr.game.vote_failed"), ChatColor.BLUE);
 			voting_failed();
 		}
 	}
@@ -642,7 +668,7 @@ public class Room {
 	}
 
 	private void election_tracker_full() {
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.et_full"));
+		sendMessage(Main.i.saves.config.getString("tr.game.et_full"), ChatColor.BLUE, true);
 		Card c = deck.getOneCard(this, true);
 
 		placeCard(c);
@@ -671,7 +697,7 @@ public class Room {
 		else {
 			fac_plc_placed++;
 			if (fac_plc_placed == 3)
-				sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.warn_chancell"));
+				sendMessage(Main.i.saves.config.getString("tr.game.warn_chancell"), ChatColor.BLUE);
 		}
 		setItemFrames();
 	}
@@ -686,11 +712,12 @@ public class Room {
 		election_tracker = 0;
 		setElectionTracker();
 
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.presd_draws"));
+		sendMessage(Main.i.saves.config.getString("tr.game.presd_draws"), ChatColor.BLUE, true);
 		Card[] cards = deck.getThreeCards(this);
 		giveGamerCards(president, cards);
 		gamestate = 2;
-		president.sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.presd_discard"));
+		president.sendMessage(
+				formatMessage(Main.i.saves.config.getString("tr.game.presd_discard"), ChatColor.BLUE, false));
 	}
 
 	// Gebe die Spieler Karten, trage diese in policies und plcsIS ein
@@ -717,6 +744,7 @@ public class Room {
 
 	// Wenn der Präsident eine Karte wegwirft
 	public void president_discard(Card c) {
+		clearChat();
 		FileConfiguration fc = Main.i.saves.config;
 
 		// Entferne alle Policies aus den Inventar des Präsidenten
@@ -741,14 +769,13 @@ public class Room {
 		giveGamerCards(chancell, newCards);
 
 		// Informiere die Spieler
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + fc.getString("tr.game.chan_gets"));
+		sendMessage(fc.getString("tr.game.chan_gets"), ChatColor.BLUE, true);
 
 		// Informiere den Kanzler
 		Main.i.delayedTask(new Runnable() {
-
 			@Override
 			public void run() {
-				chancell.sendMessage(ChatColor.BLUE + fc.getString("tr.game.chan_discard"));
+				chancell.sendMessage(formatMessage(fc.getString("tr.game.chan_discard"), ChatColor.BLUE, false));
 				FancyMessage vetomsg = new FancyMessage("");
 				if (veto_power) {
 					vetomsg = vetomsg.then(fc.getString("tr.game.veto_power")).color(ChatColor.BLUE);
@@ -763,6 +790,8 @@ public class Room {
 
 	// Wenn der Kanzler eine Karte wegwirft
 	public void chanc_discard(Card remc) {
+		clearChat();
+		
 		FileConfiguration fc = Main.i.saves.config;
 
 		Card setc = chancell.policies[0];
@@ -779,10 +808,10 @@ public class Room {
 		int fac_placed_before = fac_plc_placed;
 		placeCard(setc);
 
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + fc.getString("tr.game.chan_places"));
+		sendMessage(fc.getString("tr.game.chan_places"), ChatColor.BLUE, true);
 
 		gamestate = -1;
-		
+
 		if (checkGameEnds(null, true))
 			return;
 
@@ -801,11 +830,12 @@ public class Room {
 
 	// Wenn der Kanzler auf den Veto-Button drückt
 	public void chanc_veto() {
+		clearChat();
 		FileConfiguration c = Main.i.saves.config;
 
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.chanc_vetos"));
+		sendMessage(c.getString("tr.game.chanc_vetos"), ChatColor.BLUE, true);
 
-		president.sendMessage(ChatColor.BLUE + c.getString("tr.game.presd_veto"));
+		president.sendMessage(formatMessage(c.getString("tr.game.presd_veto"), ChatColor.BLUE, false));
 
 		FancyMessage msg = new FancyMessage(c.getString("tr.game.veto_accept")).color(ChatColor.AQUA)
 				.command("/veto 1");
@@ -819,7 +849,8 @@ public class Room {
 
 	// Die Antwort des Präsidenten
 	public void presd_veto_accept() {
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.accept"));
+		clearChat();
+		sendMessage(Main.i.saves.config.getString("tr.game.accept"), ChatColor.BLUE, true);
 		election_tracker++;
 		setElectionTracker();
 
@@ -840,7 +871,8 @@ public class Room {
 		}, 20 * 5);
 	}
 	public void presd_veto_deny() {
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.game.deny"));
+		clearChat();
+		sendMessage(Main.i.saves.config.getString("tr.game.deny"), ChatColor.BLUE, true);
 		gamestate = 3;
 	}
 
@@ -851,17 +883,17 @@ public class Room {
 		Card card = facist_board[fac_plc_placed - 1];
 		if (card == Main.i.cardmgr.cards.get("brd_invest")) {
 			// Die Parteiangehörigkeit eines Spielers erfragen
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.invest.info"));
+			sendMessage(c.getString("tr.game.power.invest.info"), ChatColor.BLUE, true);
 			president.sendAskForInvestigation(this);
 			gamestate = 5;
 		} else if (card == Main.i.cardmgr.cards.get("brd_presd")) {
 			// Den nächsten Präsidenten wählen
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.presd.info"));
+			sendMessage(c.getString("tr.game.power.presd.info"), ChatColor.BLUE, true);
 			president.sendAskForNextPresd(this);
 			gamestate = 6;
 		} else if (card == Main.i.cardmgr.cards.get("brd_exam")) {
 			// Die nächsten drei Poltiken betrachten
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.exam.info"));
+			sendMessage(c.getString("tr.game.power.exam.info"), ChatColor.BLUE, true);
 			String cards = "";
 			for (Card plc : deck.showThreeCards()) {
 				if (plc == Main.i.cardmgr.cards.get("plc_liberal"))
@@ -870,7 +902,8 @@ public class Room {
 					cards += c.getString("tr.game.power.exam.fac");
 			}
 
-			president.sendMessage(ChatColor.BLUE + c.getString("tr.game.power.exam.result") + cards);
+			president.sendMessage(
+					formatMessage(c.getString("tr.game.power.exam.result") + cards, ChatColor.BLUE, false));
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
@@ -880,8 +913,8 @@ public class Room {
 		} else if (card == Main.i.cardmgr.cards.get("brd_kill") || card == Main.i.cardmgr.cards.get("brd_veto")) {
 			// Töte einen Spieler
 			if (card == Main.i.cardmgr.cards.get("brd_veto"))
-				sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.veto.info"));
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.power.kill.info"));
+				sendMessage(c.getString("tr.game.power.veto.info"), ChatColor.BLUE, true);
+			sendMessage(c.getString("tr.game.power.kill.info"), ChatColor.BLUE, true);
 			president.sendAskToExecute(this);
 			gamestate = 7;
 		} else {
@@ -897,17 +930,18 @@ public class Room {
 
 	// Investigate
 	public void investigate(Gamer g) {
+		clearChat();
 		gamestate = -1;
 		FileConfiguration c = Main.i.saves.config;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-				+ c.getString("tr.game.power.invest.invest").replaceAll("#name", g.longName));
+		sendMessage(c.getString("tr.game.power.invest.invest").replaceAll("#name", g.longName), ChatColor.BLUE, true);
 
 		String party = c.getString("tr.game.power.invest.lib");
 		if (g.role == Role.HITLER || g.role == Role.FACIST)
 			party = c.getString("tr.game.power.invest.fac");
 
-		president.sendMessage(ChatColor.BLUE
-				+ c.getString("tr.game.power.invest.result").replaceAll("#name", g.name).replaceAll("#party", party));
+		president.sendMessage(formatMessage(
+				c.getString("tr.game.power.invest.result").replaceAll("#name", g.name).replaceAll("#party", party),
+				ChatColor.BLUE, false));
 
 		Main.i.delayedTask(new Runnable() {
 			@Override
@@ -919,6 +953,7 @@ public class Room {
 
 	// Special Election
 	public void specialElection(Gamer g) {
+		clearChat();
 		gamestate = -1;
 		// Wenn der nächste gewählt wurde, geht es normal weiter
 		if (g == nextGamer(president)) {
@@ -932,18 +967,17 @@ public class Room {
 		chancell = null;
 		last_president = president;
 		president = g;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-				+ Main.i.saves.config.getString("tr.game.pres_was_elected").replaceAll("#name", president.longName));
+		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
 
 		president.sendChancellElectionMessage(this);
 	}
 
 	// Hinrichtung
 	public void executeGamer(Gamer g) {
+		clearChat();
 		gamestate = -1;
 		FileConfiguration c = Main.i.saves.config;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-				+ c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName));
+		sendMessage(c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName), ChatColor.BLUE, true);
 		gamers.remove(g);
 		killed.add(g);
 		g.state = 0;
@@ -993,11 +1027,9 @@ public class Room {
 
 		gamers.addAll(this.killed);
 		if (win == 0) {
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-					+ c.getString("tr.game.end.libwin") + cause);
+			sendMessage(c.getString("tr.game.end.libwin") + cause, ChatColor.BLUE, true);
 		} else {
-			sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD
-					+ c.getString("tr.game.end.facwin") + cause);
+			sendMessage(c.getString("tr.game.end.facwin") + cause, ChatColor.BLUE, true);
 		}
 
 		Main.i.getLogger().info("Game started in " + name + ".");
@@ -1015,7 +1047,7 @@ public class Room {
 
 	private void openSecretRoles() {
 		FileConfiguration c = Main.i.saves.config;
-		sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + c.getString("tr.game.end.roles"));
+		sendMessage(c.getString("tr.game.end.roles"), ChatColor.BLUE, true);
 		String msg = "";
 		int n = 0;
 
@@ -1032,13 +1064,13 @@ public class Room {
 			msg += "   ";
 			n++;
 			if (n == 2) {
-				sendMessage(msg);
+				sendMessage(msg, ChatColor.WHITE);
 				msg = "";
 				n = 0;
 			}
 		}
 		if (msg != "")
-			sendMessage(msg);
+			sendMessage(msg, ChatColor.WHITE);
 
 		// Beende das Spiel
 		Main.i.delayedTask(new Runnable() {

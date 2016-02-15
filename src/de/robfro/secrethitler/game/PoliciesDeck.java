@@ -2,6 +2,7 @@ package de.robfro.secrethitler.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import org.bukkit.ChatColor;
 
@@ -26,7 +27,7 @@ public class PoliciesDeck {
 	}
 	
 	private void shuffle() {
-		Collections.shuffle(draw);
+		Collections.shuffle(draw, new Random(System.nanoTime()));
 	}
 	
 	public Card getOneCard(Room r, boolean check) {
@@ -50,7 +51,7 @@ public class PoliciesDeck {
 		if (draw.size() < 3) {
 			draw.addAll(discard);
 			shuffle();
-			r.sendMessage(ChatColor.BLUE + Main.i.saves.config.getString("tr.game.cards_shuffled"));
+			r.sendMessage(Main.i.saves.config.getString("tr.game.cards_shuffled"), ChatColor.BLUE);
 		}
 	}
 	

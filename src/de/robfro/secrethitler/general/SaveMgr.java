@@ -120,73 +120,73 @@ public class SaveMgr {
 		config.addDefault("tr.pregame.your_fuehrer", "Folgender Spieler ist Hitler: ");
 		config.addDefault("tr.pregame.other_facists", "Folgende Spieler spielen ebenfalls als Faschist: ");
 
-		config.addDefault("tr.game.pres_was_elected", "#name wurde zum Präsidenten gewählt.");
+		config.addDefault("tr.game.pres_was_elected", "#prnm wurde zum Präsidenten gewählt.");
 		config.addDefault("tr.game.nominate_chancell", "Als Präsindent musst du nun einen Kanzler nominieren.");
 		config.addDefault("tr.game.nom.yes", "Nominiere diesen Spieler.");
 		config.addDefault("tr.game.nom.president", "Der Präsident darf sich nicht nominieren.");
 		config.addDefault("tr.game.nom.last_chanc", "Der letzte Kanzler darf nicht nominiert werden.");
 		config.addDefault("tr.game.nom.last_presd", "Der letzte Präsident darf nicht nominiert werden.");
-		config.addDefault("tr.game.vote", "Der Präsident schlägt #name als Kanzler vor. Bitte stimmt ab.");
+		config.addDefault("tr.game.vote", "#prnm schlägt #chnm als Kanzler vor. Bitte stimmt ab.");
 		config.addDefault("tr.game.votehelp", "Rechtsklick mit der entsprechende Wahlkarte.");
 		config.addDefault("tr.game.vote_ja", "Du stimmst für den Kanzler.");
 		config.addDefault("tr.game.vote_nein", "Du stimmst gegen den Kanzler.");
 		config.addDefault("tr.game.result", "Die Wahl ist abgeschlossen. Hier siehst du das Wahlergebnis:");
 		config.addDefault("tr.game.result_ja", ChatColor.GREEN + "JA");
 		config.addDefault("tr.game.result_nein", ChatColor.RED + "NEIN");
-		config.addDefault("tr.game.vote_sucessf", "#name wurde erfolgreich zum Kanzler gewählt.");
-		config.addDefault("tr.game.vote_failed", "#name wurde nicht gewählt.");
+		config.addDefault("tr.game.vote_sucessf", "#chnm wurde erfolgreich zum Kanzler gewählt.");
+		config.addDefault("tr.game.vote_failed", "#chnm wurde nicht gewählt.");
 
 		config.addDefault("tr.game.cards_shuffled", "Die Artikelkarten wurden neu gemischt.");
 		config.addDefault("tr.game.et_full",
 				"Es kam zu drei Fehlwahlen in Folge. Deshalb wird der oberste Artikel aufgedeckt und gelegt. Die präsidiale Macht verfällt.");
 		config.addDefault("tr.game.presd_draws",
-				"Der Präsindent zieht nun drei Artikelkarten und vernichtet eine davon.");
+				"#prnm zieht nun drei Artikelkarten und vernichtet eine davon.");
 		config.addDefault("tr.game.presd_discard",
 				"Du hast drei Artikelkarten gezogen. Du musst eine davon vernichten, indem du diese mit Q aus deinen Inventar wirfst.");
 		config.addDefault("tr.game.chan_gets",
-				"Der Präsindent vernichtet eine Karte und gibt die anderen Beiden den Kanzler. Dieser muss nun entscheiden welcher Artikel gelegt wird.");
+				"#prnm vernichtet eine Karte und gibt die anderen Beiden #chnm. Dieser muss nun entscheiden welcher Artikel gelegt wird.");
 		config.addDefault("tr.game.chan_discard",
-				"Du hast nun zwei Artikelkarten vom Präsidenten bekommen. Wirf eine davon mit Q aus den Inventar, um diese zu vernichten. Die andere wird gelegt.");
+				"Du hast nun zwei Artikelkarten von #prnm bekommen. Wirf eine davon mit Q aus den Inventar, um diese zu vernichten. Die andere wird gelegt.");
 		config.addDefault("tr.game.veto_power", "Du hast die Möglichkeit in Veto zu gehen: ");
 		config.addDefault("tr.game.veto", "[VETO]");
 		config.addDefault("tr.game.chan_places",
-				"Der Kanzler hat eine Karte vernichtet und die andere auf das Brett gelegt.");
-		config.addDefault("tr.game.chanc_vetos", "Der Kanzler reicht ein Veto ein. Nun muss der Präsident bestäigen.");
+				"#chnm hat eine Karte vernichtet und die andere auf das Brett gelegt.");
+		config.addDefault("tr.game.chanc_vetos", "#chnm reicht ein Veto ein. Nun muss #prnm bestätigen.");
 		config.addDefault("tr.game.presd_veto",
-				"Stimmst du den Veto des Kanzlers zu, um diese Runde kein Artikel zu legen? ");
+				"Stimmst du den Veto con #chnm zu, um diese Runde kein Artikel zu legen? ");
 		config.addDefault("tr.game.veto_accept", "[VETO ZUSTIMMEN]");
 		config.addDefault("tr.game.veto_deny", "[VETO ABLEHNEN]");
 		config.addDefault("tr.game.accept",
-				"Der Präsident hat das Veto angenommen. Diese Runde wird kein Artikel gelegt.");
+				"#prnm hat das Veto angenommen. Diese Runde wird kein Artikel gelegt.");
 		config.addDefault("tr.game.deny",
-				"Der Präsident hat das Veto abgelehnt. Der Kanzler muss sich nun für ein Artikel entscheiden.");
+				"#prnm hat das Veto abgelehnt. #chnm muss sich nun für ein Artikel entscheiden.");
 
 		config.addDefault("tr.game.power.invest.info",
-				"Der Präsident kann nun die Parteiangehörigkeit eines Spielers erfahren.");
+				"#prnm kann nun die Parteiangehörigkeit eines Spielers erfahren.");
 		config.addDefault("tr.game.power.invest.who",
 				"Von welchen Spieler willst du die Parteiangehörigkeit erfahren?");
 		config.addDefault("tr.game.power.invest.this", "Wähle diesen Spieler.");
 		config.addDefault("tr.game.power.invest.you", "Du kannst dich nicht selber überprüfen.");
 		config.addDefault("tr.game.power.invest.was_invest", "Dieser Spieler wurde schon einmal überprüft.");
-		config.addDefault("tr.game.power.invest.invest", "Der Präsindent überprüft die Parteiangehörigkeit von #name.");
+		config.addDefault("tr.game.power.invest.invest", "#prnm überprüft die Parteiangehörigkeit von #name.");
 		config.addDefault("tr.game.power.invest.result", "#name gehört der #party Partei an.");
 		config.addDefault("tr.game.power.invest.fac", "faschisten");
 		config.addDefault("tr.game.power.invest.lib", "liberalen");
 
-		config.addDefault("tr.game.power.presd.info", "Der Präsident darf nun den nächsten Präsidenten bestimmen.");
+		config.addDefault("tr.game.power.presd.info", "#prnm darf nun den nächsten Präsidenten bestimmen.");
 		config.addDefault("tr.game.power.presd.who", "Welcher Spieler soll nächster Präsident werden?");
 		config.addDefault("tr.game.power.presd.this", "Wähle diesen Spieler.");
 		config.addDefault("tr.game.power.presd.you", "Du kannst dich nicht selber wählen.");
 
 		config.addDefault("tr.game.power.exam.info",
-				"Der Präsident kann nun die nächsten drei Artikel vom Stapel betrachten.");
+				"#prnm kann nun die nächsten drei Artikel vom Stapel betrachten.");
 		config.addDefault("tr.game.power.exam.result", "Die nächsten drei Artikel sind: ");
 		config.addDefault("tr.game.power.exam.fac", ChatColor.RED + "[Faschistisch] ");
 		config.addDefault("tr.game.power.exam.lib", ChatColor.DARK_AQUA + "[Liberal] ");
 
 		config.addDefault("tr.game.power.veto.info", "Das Vetorecht wurde freigeschalten.");
 
-		config.addDefault("tr.game.power.kill.info", "Der Präsident muss nun einen Spieler hinrichten.");
+		config.addDefault("tr.game.power.kill.info", "#prnm muss nun einen Spieler hinrichten.");
 		config.addDefault("tr.game.power.kill.who", "Welchen Spieler soll hingerichtet werden?");
 		config.addDefault("tr.game.power.kill.this", "Wähle diesen Spieler.");
 		config.addDefault("tr.game.power.kill.you", "Du kannst dich nicht selber hinrichten lassen.");
@@ -247,6 +247,8 @@ public class SaveMgr {
 
 		config.addDefault("config.game.liberal_plcs", 6);
 		config.addDefault("config.game.facist_plcs", 11);
+		config.addDefault("config.game.presd_color", ChatColor.DARK_GREEN);
+		config.addDefault("config.game.chanc_color", ChatColor.GOLD);
 
 		config.options().copyDefaults(true);
 
