@@ -18,6 +18,7 @@ import de.robfro.secrethitler.game.PoliciesDeck;
 import de.robfro.secrethitler.game.Role;
 import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.general.MyLib;
+import de.robfro.secrethitler.general.Sidebar;
 import mkremins.fanciful.FancyMessage;
 
 public class Room {
@@ -37,7 +38,8 @@ public class Room {
 
 	// Spielerbezogenene Eigenschaften
 	public ArrayList<Gamer> gamers;
-	public ArrayList<Gamer> killed;
+	//public ArrayList<Gamer> killed;
+	public ArrayList<Gamer> all_gamers;
 	public boolean playing = false;
 	public int waiting_time;
 
@@ -61,10 +63,13 @@ public class Room {
 	private Gamer last_president, last_chancell;
 	private boolean special_election;
 	public boolean veto_power;
+	
+	private Sidebar sbar;
 
 	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
 		gamers = new ArrayList<>();
+		all_gamers = new ArrayList<>();
 		name = key;
 		all_right = true;
 
@@ -118,6 +123,8 @@ public class Room {
 		et_material2 = c.getString(key + ".et_material2", "35:14");
 
 		resetRoom();
+		
+		sbar = new Sidebar(10, name, ChatColor.BOLD + name);
 	}
 
 	// Erstelle einen neuen Raum
@@ -130,6 +137,8 @@ public class Room {
 		et_material2 = "35:14";
 
 		resetRoom();
+		
+		sbar = new Sidebar(10, name, ChatColor.BOLD + name);
 	}
 
 	// Speichere den Raum
@@ -162,7 +171,7 @@ public class Room {
 			return;
 		FileConfiguration c = Main.i.saves.config;
 		sign.setLine(0, ChatColor.DARK_BLUE.toString() + ChatColor.BOLD + "[" + name + "]");
-		sign.setLine(1, c.getString("tr.lobby.player") + ": " + gamers.size() + "/" + Main.i.saves.max_player);
+		sign.setLine(1, c.getString("tr.lobby.player") + ": " + all_gamers.size() + "/" + Main.i.saves.max_player);
 		if (playing)
 			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.DARK_RED + c.getString("tr.lobby.playing"));
 		else
@@ -176,9 +185,10 @@ public class Room {
 			return;
 
 		// Entfernt Spieler, wenn vorhanden
-		if (gamers != null) {
-			for (Gamer g : gamers) {
+		if (all_gamers != null) {
+			for (Gamer g : all_gamers) {
 				if (g.state != 0) {
+					g.player.setScoreboard(Main.i.getServer().getScoreboardManager().getNewScoreboard());
 					g.getInventory().clear();
 					g.state = 0;
 					g.joinedRoom = null;
@@ -189,6 +199,7 @@ public class Room {
 		}
 
 		gamers = new ArrayList<>();
+		all_gamers = new ArrayList<>();
 		waiting_time = Main.i.saves.config.getInt("config.wait.wait_at_min");
 		election_tracker = 0;
 		setBoardArrays(5);
@@ -214,7 +225,7 @@ public class Room {
 		}
 
 		// CHECK: Noch ein Platz frei
-		if (gamers.size() >= Main.i.saves.max_player) {
+		if (all_gamers.size() >= Main.i.saves.max_player) {
 			Main.i.mylib.sendError(g, "room_full");
 			return;
 		}
@@ -223,6 +234,7 @@ public class Room {
 		g.state = 1;
 		g.joinedRoom = this;
 		gamers.add(g);
+		all_gamers.add(g);
 		sendMessage(Main.i.saves.config.getString("tr.waiting.join").replaceAll("#name", g.longName), ChatColor.YELLOW);
 
 		if (!g.isDummy)
@@ -230,9 +242,11 @@ public class Room {
 
 		updateSign();
 
-		int maxtime = maxWaitTime(gamers.size());
+		int maxtime = maxWaitTime(all_gamers.size());
 		if (waiting_time > maxtime)
 			waiting_time = maxtime;
+		
+		updateSidebar();
 	}
 
 	// Wenn ein Spieler das Spiel verlässt, muss er entfernt werden
@@ -243,7 +257,8 @@ public class Room {
 
 		if (playing) {
 			// Wenn jmd im Spiel leavt
-			if (gamers.contains(g)) {
+			if (all_gamers.contains(g)) {
+				all_gamers.remove(g);
 				gamers.remove(g);
 				checkGameEnds(g, false);
 				if (gamers.size() >= 3) {
@@ -256,15 +271,15 @@ public class Room {
 					resetRoom();
 				}
 			}
-			if (killed.contains(g))
-				killed.remove(g);
 		} else {
 			gamers.remove(g);
+			all_gamers.remove(g);
 			waiting_time += c.getInt("config.wait.less_per_player");
 			onTimerOneSecond();
 		}
-
+		
 		updateSign();
+		updateSidebar();
 	}
 
 	// Sendet eine Nachricht an alle Spieler in diesem Raum
@@ -274,12 +289,12 @@ public class Room {
 
 	public void sendMessage(String msg, ChatColor color, boolean bold) {
 		msg = formatMessage(msg, color, bold);
-		for (Gamer g : gamers)
+		for (Gamer g : all_gamers)
 			g.sendMessage(msg);
 	}
 
 	public void clearChat() {
-		for (Gamer g : gamers)
+		for (Gamer g : all_gamers)
 			for (int i=0; i<3; i++)
 				g.sendMessage(" ");
 	}
@@ -302,7 +317,7 @@ public class Room {
 		if (playing)
 			return;
 		FileConfiguration c = Main.i.saves.config;
-		if (gamers.size() < c.getInt("config.wait.min_player")) {
+		if (all_gamers.size() < c.getInt("config.wait.min_player")) {
 			waiting_time = c.getInt("config.wait.wait_at_min");
 		} else {
 			waiting_time--;
@@ -321,13 +336,13 @@ public class Room {
 
 	// Sende an alle Spieler einen Ton
 	private void sendTone(float pitch) {
-		for (Gamer g : gamers)
+		for (Gamer g : all_gamers)
 			g.player.playSound(g.player.getLocation(), Sound.NOTE_PLING, 1f, pitch);
 	}
 
 	// Update die Levelanzeige aller Spieler
 	private void setLevel(int lvl, int max) {
-		for (Gamer g : gamers) {
+		for (Gamer g : all_gamers) {
 			g.player.setLevel(lvl);
 			if (lvl <= max)
 				g.player.setExp(((float) lvl) / max);
@@ -358,16 +373,15 @@ public class Room {
 		updateSign();
 
 		// Lösche alle Items, gebe die Vote-Karten
-		for (Gamer g : gamers) {
+		for (Gamer g : all_gamers) {
 			g.getInventory().clear();
 			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_ja").getItemStack(true));
 			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_nein").getItemStack(true));
 		}
 
 		// Initialisiere das Brett
-		setBoardArrays(gamers.size());
+		setBoardArrays(all_gamers.size());
 
-		killed = new ArrayList<>();
 		deck = new PoliciesDeck(c.getInt("config.game.liberal_plcs"), c.getInt("config.game.facist_plcs"));
 		fac_plc_placed = 0;
 		lib_plc_placed = 0;
@@ -557,6 +571,8 @@ public class Room {
 		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
 
 		president.sendChancellElectionMessage(this);
+		
+		updateSidebar();
 	}
 
 	// Gibt den nächsten Spieler am Tisch aus
@@ -598,6 +614,8 @@ public class Room {
 		// Lösche alle Wahlabgaben
 		for (Gamer g : gamers)
 			g.vote = -1;
+		
+		updateSidebar();
 	}
 
 	// Wenn ein Spieler wählt, wird überprüft, ob alle abgestimmt haben.
@@ -652,6 +670,7 @@ public class Room {
 		election_tracker++;
 		setElectionTracker();
 		chancell = null;
+		updateSidebar();
 
 		// Warte 5 sec
 		Main.i.delayedTask(new Runnable() {
@@ -708,6 +727,8 @@ public class Room {
 		if (checkGameEnds(null, false))
 			return;
 
+		updateSidebar();
+		
 		// Setze den ET zurück
 		election_tracker = 0;
 		setElectionTracker();
@@ -969,6 +990,8 @@ public class Room {
 		president = g;
 		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
 
+		updateSidebar();
+		
 		president.sendChancellElectionMessage(this);
 	}
 
@@ -979,8 +1002,8 @@ public class Room {
 		FileConfiguration c = Main.i.saves.config;
 		sendMessage(c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName), ChatColor.BLUE, true);
 		gamers.remove(g);
-		killed.add(g);
 		g.state = 0;
+		updateSidebar();
 
 		if (checkGameEnds(g, true))
 			return;
@@ -1025,7 +1048,6 @@ public class Room {
 		if (win == -1)
 			return false;
 
-		gamers.addAll(this.killed);
 		if (win == 0) {
 			sendMessage(c.getString("tr.game.end.libwin") + cause, ChatColor.BLUE, true);
 		} else {
@@ -1052,7 +1074,7 @@ public class Room {
 		int n = 0;
 
 		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
-		for (Gamer g : gamers) {
+		for (Gamer g : all_gamers) {
 			msg += ChatColor.RESET + g.longName + ": ";
 			if (g.role == Role.FACIST)
 				msg += c.getString("tr.pregame.rl_facist");
@@ -1081,4 +1103,30 @@ public class Room {
 		}, 20 * 5);
 	}
 
+	private void updateSidebar() {
+		FileConfiguration c = Main.i.saves.config;
+		sbar.clear();
+		
+		for (int i=0; i<all_gamers.size(); i++) {
+			Gamer g = all_gamers.get(i);
+			String s = g.longName;
+			
+			if (g.state != 1)
+				s = c.getString("config.game.dead_color") + g.longName;
+			else if (president == g)
+				s = c.getString("config.game.presd_color") + g.longName + " " + c.getString("config.game.presd_abbr");
+			else if (chancell == g)
+				s = c.getString("config.game.chanc_color") + g.longName + " " + c.getString("config.game.chanc_abbr");
+			else if (last_chancell == g)
+				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lchanc_abbr");
+			else if (last_president == g && gamers.size() > 5)
+				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lpresd_abbr");
+		
+			sbar.setEntry(i, s);
+		}
+		
+		for (Gamer g : all_gamers)
+			sbar.addToPlayer(g.player);
+	}
+	
 }

@@ -222,7 +222,7 @@ public class SaveMgr {
 
 		config.addDefault("config.allow_chat_in_lobby", true);
 		config.addDefault("config.max_player_in_room", 10);
-		config.addDefault("config.spawnpoint", "13,22,63");
+		config.addDefault("config.spawnpoint", "8,22,30");
 
 		config.addDefault("config.wait.min_player", 5);
 		config.addDefault("config.wait.wait_at_min", 60);
@@ -248,7 +248,13 @@ public class SaveMgr {
 		config.addDefault("config.game.liberal_plcs", 6);
 		config.addDefault("config.game.facist_plcs", 11);
 		config.addDefault("config.game.presd_color", ChatColor.DARK_GREEN);
+		config.addDefault("config.game.presd_abbr", "[P]");
 		config.addDefault("config.game.chanc_color", ChatColor.GOLD);
+		config.addDefault("config.game.chanc_abbr", "[K]");
+		config.addDefault("config.game.last_color", ChatColor.GRAY);
+		config.addDefault("config.game.dead_color", ChatColor.DARK_GRAY);
+		config.addDefault("config.game.lchanc_abbr", "[lK]");
+		config.addDefault("config.game.lpresd_abbr", "[lP]");
 
 		config.options().copyDefaults(true);
 
