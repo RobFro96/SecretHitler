@@ -205,7 +205,7 @@ public class Gamer {
 
 		for (Gamer g : r.gamers) {
 			msg = msg.then("[" + g.longName + "]");
-			switch (r.canBeNominated(g)) {
+			switch (Main.i.vtmgr.canBeNominated(r, g)) {
 			case 0:
 				msg = msg.color(ChatColor.AQUA);
 				msg = msg.command("/nominate " + g.name);
@@ -249,11 +249,11 @@ public class Gamer {
 			if (c == Main.i.cardmgr.cards.get("vt_ja")) {
 				vote = 1;
 				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_ja"));
-				joinedRoom.updateVoting();
+				Main.i.vtmgr.updateVoting(joinedRoom);
 			} else if (c == Main.i.cardmgr.cards.get("vt_nein")) {
 				vote = 0;
 				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_nein"));
-				joinedRoom.updateVoting();
+				Main.i.vtmgr.updateVoting(joinedRoom);
 			}
 		}
 	}

@@ -44,11 +44,11 @@ public class Room {
 	public int waiting_time;
 
 	// Ingame
-	private Card[] facist_board;
-	private Card[] liberal_board;
-	private PoliciesDeck deck;
-	private int fac_plc_placed, lib_plc_placed;
-	private int election_tracker;
+	public Card[] facist_board;
+	public Card[] liberal_board;
+	public PoliciesDeck deck;
+	public int fac_plc_placed, lib_plc_placed;
+	public int election_tracker;
 	public int gamestate; // 0..Nominate Chancellor
 							// 1..Wahl vergeben
 							// 2..Präsident eliminiert
@@ -60,11 +60,11 @@ public class Room {
 
 	// Roles
 	public Gamer president, chancell;
-	private Gamer last_president, last_chancell;
-	private boolean special_election;
+	public Gamer last_president, last_chancell;
+	public boolean special_election;
 	public boolean veto_power;
 	
-	private Sidebar sbar;
+	public Sidebar sbar;
 
 	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
@@ -122,7 +122,7 @@ public class Room {
 		et_material1 = c.getString(key + ".et_material1", "35:15");
 		et_material2 = c.getString(key + ".et_material2", "35:14");
 
-		resetRoom();
+		Main.i.rooms.resetRoom(this);
 		
 		sbar = new Sidebar(10, name, ChatColor.BOLD + name);
 	}
@@ -136,7 +136,7 @@ public class Room {
 		et_material1 = "35:15";
 		et_material2 = "35:14";
 
-		resetRoom();
+		Main.i.rooms.resetRoom(this);
 		
 		sbar = new Sidebar(10, name, ChatColor.BOLD + name);
 	}
@@ -163,123 +163,6 @@ public class Room {
 
 		c.set(name + ".et_material1", et_material1);
 		c.set(name + ".et_material2", et_material2);
-	}
-
-	// Beschrifte das JoinSchild neu
-	public void updateSign() {
-		if (!all_right)
-			return;
-		FileConfiguration c = Main.i.saves.config;
-		sign.setLine(0, ChatColor.DARK_BLUE.toString() + ChatColor.BOLD + "[" + name + "]");
-		sign.setLine(1, c.getString("tr.lobby.player") + ": " + all_gamers.size() + "/" + Main.i.saves.max_player);
-		if (playing)
-			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.DARK_RED + c.getString("tr.lobby.playing"));
-		else
-			sign.setLine(2, ChatColor.BOLD.toString() + ChatColor.GREEN + c.getString("tr.lobby.waiting"));
-		sign.update();
-	}
-
-	// Setzt den Raum in einen Ausgangszustand zurück.
-	private void resetRoom() {
-		if (!all_right)
-			return;
-
-		// Entfernt Spieler, wenn vorhanden
-		if (all_gamers != null) {
-			for (Gamer g : all_gamers) {
-				if (g.state != 0) {
-					g.player.setScoreboard(Main.i.getServer().getScoreboardManager().getNewScoreboard());
-					g.getInventory().clear();
-					g.state = 0;
-					g.joinedRoom = null;
-					if (!g.isDummy)
-						g.player.teleport(Main.i.saves.spawnPoint);
-				}
-			}
-		}
-
-		gamers = new ArrayList<>();
-		all_gamers = new ArrayList<>();
-		waiting_time = Main.i.saves.config.getInt("config.wait.wait_at_min");
-		election_tracker = 0;
-		setBoardArrays(5);
-		fac_plc_placed = 0;
-		lib_plc_placed = 0;
-		playing = false;
-
-
-		setElectionTracker();
-		setItemFrames();
-		updateSign();
-	}
-
-	// Ein Spieler will diesen Raum joinen
-	public void join(Gamer g) {
-		if (!all_right)
-			return;
-
-		// CHECK: Raum spielt nicht
-		if (playing) {
-			Main.i.mylib.sendError(g, "room_ingame");
-			return;
-		}
-
-		// CHECK: Noch ein Platz frei
-		if (all_gamers.size() >= Main.i.saves.max_player) {
-			Main.i.mylib.sendError(g, "room_full");
-			return;
-		}
-
-		// Er joint
-		g.state = 1;
-		g.joinedRoom = this;
-		gamers.add(g);
-		all_gamers.add(g);
-		sendMessage(Main.i.saves.config.getString("tr.waiting.join").replaceAll("#name", g.longName), ChatColor.YELLOW);
-
-		if (!g.isDummy)
-			g.player.teleport(spawn);
-
-		updateSign();
-
-		int maxtime = maxWaitTime(all_gamers.size());
-		if (waiting_time > maxtime)
-			waiting_time = maxtime;
-		
-		updateSidebar();
-	}
-
-	// Wenn ein Spieler das Spiel verlässt, muss er entfernt werden
-	public void quit(Gamer g) {
-		FileConfiguration c = Main.i.saves.config;
-
-		sendMessage(Main.i.saves.config.getString("tr.waiting.quit").replaceAll("#name", g.longName), ChatColor.YELLOW);
-
-		if (playing) {
-			// Wenn jmd im Spiel leavt
-			if (all_gamers.contains(g)) {
-				all_gamers.remove(g);
-				gamers.remove(g);
-				checkGameEnds(g, false);
-				if (gamers.size() >= 3) {
-					if (g == president || g == chancell)
-						setNewPresident();
-				} else if (gamers.size() == 2) {
-					sendMessage(c.getString("tr.game.end.lessplayer"), ChatColor.BLUE, true);
-					openSecretRoles();
-				} else {
-					resetRoom();
-				}
-			}
-		} else {
-			gamers.remove(g);
-			all_gamers.remove(g);
-			waiting_time += c.getInt("config.wait.less_per_player");
-			onTimerOneSecond();
-		}
-		
-		updateSign();
-		updateSidebar();
 	}
 
 	// Sendet eine Nachricht an alle Spieler in diesem Raum
@@ -324,7 +207,7 @@ public class Room {
 
 			if (waiting_time <= 0) {
 				sendTone(2f);
-				start();
+				Main.i.gamemgr.start(this);
 			}
 
 			if (waiting_time <= 5)
@@ -341,7 +224,7 @@ public class Room {
 	}
 
 	// Update die Levelanzeige aller Spieler
-	private void setLevel(int lvl, int max) {
+	public void setLevel(int lvl, int max) {
 		for (Gamer g : all_gamers) {
 			g.player.setLevel(lvl);
 			if (lvl <= max)
@@ -360,387 +243,11 @@ public class Room {
 		return c.getInt("config.wait.wait_at_min") - (cnt - min) * c.getInt("config.wait.less_per_player");
 	}
 
-	// Starte das Spiel
-	private void start() {
-		// Sende der Konsole und allen Mitspielern die Nachricht, dass das Spiel
-		// startet.
-		FileConfiguration c = Main.i.saves.config;
-		Main.i.getLogger().info("Game started in " + name + ".");
-		sendMessage(c.getString("tr.pregame.started"), ChatColor.BLUE, true);
-
-		setLevel(0, 0);
-		playing = true;
-		updateSign();
-
-		// Lösche alle Items, gebe die Vote-Karten
-		for (Gamer g : all_gamers) {
-			g.getInventory().clear();
-			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_ja").getItemStack(true));
-			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_nein").getItemStack(true));
-		}
-
-		// Initialisiere das Brett
-		setBoardArrays(all_gamers.size());
-
-		deck = new PoliciesDeck(c.getInt("config.game.liberal_plcs"), c.getInt("config.game.facist_plcs"));
-		fac_plc_placed = 0;
-		lib_plc_placed = 0;
-		election_tracker = 0;
-		president = null;
-		last_president = null;
-		chancell = null;
-		last_chancell = null;
-		veto_power = false;
-		special_election = false;
-
-		gamestate = -1;
-
-		setItemFrames();
-		setElectionTracker();
-
-		// Vergeben der Rollen
-		setRoles();
-		giveRoleCards();
-
-		clearChat();
-		
-		// Sende die Nachricht an alle Spieler
-		for (Gamer g : gamers)
-			g.sendRoleMessage(gamers);
-
-		// Nach 5s wird der erste President bestimmt.
-		Main.i.delayedTask(new Runnable() {
-			@Override
-			public void run() {
-				setNewPresident();
-			}
-		}, 20 * 5);
-
-	}
-
-	// Errechnet das facist_board-Array
-	private void setBoardArrays(int size) {
-		facist_board = new Card[6];
-		switch (size) {
-		case 5:
-		case 6:
-			facist_board[0] = Main.i.cardmgr.cards.get("brd_facempty");
-			// facist_board[0] = Main.i.cardmgr.cards.get("brd_kill");
-			facist_board[1] = Main.i.cardmgr.cards.get("brd_facempty");
-			facist_board[2] = Main.i.cardmgr.cards.get("brd_exam");
-			facist_board[3] = Main.i.cardmgr.cards.get("brd_kill");
-			facist_board[4] = Main.i.cardmgr.cards.get("brd_veto");
-			facist_board[5] = Main.i.cardmgr.cards.get("brd_facend");
-			break;
-		case 7:
-		case 8:
-			facist_board[0] = Main.i.cardmgr.cards.get("brd_facempty");
-			facist_board[1] = Main.i.cardmgr.cards.get("brd_invest");
-			facist_board[2] = Main.i.cardmgr.cards.get("brd_presd");
-			facist_board[3] = Main.i.cardmgr.cards.get("brd_kill");
-			facist_board[4] = Main.i.cardmgr.cards.get("brd_veto");
-			facist_board[5] = Main.i.cardmgr.cards.get("brd_facend");
-			break;
-		case 9:
-		case 10:
-			facist_board[0] = Main.i.cardmgr.cards.get("brd_invest");
-			facist_board[1] = Main.i.cardmgr.cards.get("brd_invest");
-			facist_board[2] = Main.i.cardmgr.cards.get("brd_presd");
-			facist_board[3] = Main.i.cardmgr.cards.get("brd_kill");
-			facist_board[4] = Main.i.cardmgr.cards.get("brd_veto");
-			facist_board[5] = Main.i.cardmgr.cards.get("brd_facend");
-			break;
-		}
-
-		liberal_board = new Card[5];
-		liberal_board[0] = Main.i.cardmgr.cards.get("brd_libempty");
-		liberal_board[1] = Main.i.cardmgr.cards.get("brd_libempty");
-		liberal_board[2] = Main.i.cardmgr.cards.get("brd_libempty");
-		liberal_board[3] = Main.i.cardmgr.cards.get("brd_libempty");
-		liberal_board[4] = Main.i.cardmgr.cards.get("brd_libend");
-	}
-
-	// Setzt die entsprechende Items in die Frames
-	private void setItemFrames() {
-		for (int i = 0; i < facist_board.length; i++) {
-			ItemFrame itmf = Main.i.mylib.getItemFrameInLocation(itemFrameLocations[i]);
-			if (fac_plc_placed > i)
-				itmf.setItem(Main.i.cardmgr.cards.get("plc_facist").getItemStack(false));
-			else
-				itmf.setItem(facist_board[i].getItemStack(false));
-		}
-
-		for (int i = 0; i < liberal_board.length; i++) {
-			ItemFrame itmf = Main.i.mylib.getItemFrameInLocation(itemFrameLocations[i + facist_board.length]);
-			if (lib_plc_placed > i)
-				itmf.setItem(Main.i.cardmgr.cards.get("plc_liberal").getItemStack(false));
-			else
-				itmf.setItem(liberal_board[i].getItemStack(false));
-		}
-
-		// Setze die Veto-Power
-		if (fac_plc_placed >= 5)
-			veto_power = true;
-	}
-
-	// Setze die Blöcke des ElectionTrackers
-	private void setElectionTracker() {
-		for (int i = 0; i < electionTracker.length; i++) {
-			if (election_tracker > i)
-				Main.i.mylib.setBlock(et_material2, electionTracker[i]);
-			else
-				Main.i.mylib.setBlock(et_material1, electionTracker[i]);
-		}
-	}
-
-	// Errechne und setze die Rollen der einzelnen Spieler
-	private void setRoles() {
-		ArrayList<Role> list = new ArrayList<>();
-
-		list.add(Role.HITLER);
-
-		switch (gamers.size()) {
-		case 5:
-		case 6:
-			list.add(Role.FACIST);
-			break;
-		case 7:
-		case 8:
-			list.add(Role.FACIST);
-			list.add(Role.FACIST);
-			break;
-		case 9:
-		case 10:
-			list.add(Role.FACIST);
-			list.add(Role.FACIST);
-			list.add(Role.FACIST);
-			break;
-		}
-
-		while (list.size() < gamers.size())
-			list.add(Role.LIBERAL);
-
-		Collections.shuffle(list, new Random(System.nanoTime()));
-
-		for (int i = 0; i < gamers.size(); i++) {
-			gamers.get(i).role = list.get(i);
-		}
-	}
-
-	// Gebe den Spielern die entsprechende Karte
-	private void giveRoleCards() {
-		for (Gamer g : gamers) {
-			switch (g.role) {
-			case FACIST:
-				g.getInventory().addItem(Main.i.cardmgr.cards.get("rl_facist").getItemStack(true));
-				break;
-			case HITLER:
-				g.getInventory().addItem(Main.i.cardmgr.cards.get("rl_hitler").getItemStack(true));
-				break;
-			case LIBERAL:
-				g.getInventory().addItem(Main.i.cardmgr.cards.get("rl_liberal").getItemStack(true));
-				break;
-			}
-		}
-	}
-
-	// Bestimmt den neuen Presidenten
-	private void setNewPresident() {
-		// Übertrage den Kanzler
-		if (chancell != null) {
-			last_chancell = chancell;
-			chancell = null;
-		}
-
-		if (special_election) {
-			// Wenn es zu eine SpecialElection kam, muss der nächste nach den
-			// President zuvor genommen werden
-			special_election = false;
-			Gamer next = nextGamer(last_president);
-			last_president = president;
-			president = next;
-		} else if (president == null) {
-			// Wenn das Spiel neu gestartet wurde, wird der President gelost
-			president = gamers.get(new Random(System.nanoTime()).nextInt(gamers.size()));
-		} else {
-			Gamer next = nextGamer(president);
-			last_president = president;
-			president = next;
-		}
-
-		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
-
-		president.sendChancellElectionMessage(this);
-		
-		updateSidebar();
-	}
-
-	// Gibt den nächsten Spieler am Tisch aus
-	private Gamer nextGamer(Gamer prev) {
-		boolean next = false;
-		for (Gamer g : gamers) {
-			if (g == prev)
-				next = true;
-			else if (next)
-				return g;
-		}
-		return gamers.get(0);
-	}
-
-	// Gibt als Zahl den Grund der Nicht-nominierung zurück
-	public int canBeNominated(Gamer g) {
-		// Spieler ist Präsident
-		if (g == president)
-			return 1;
-		// Spieler ist letzter Kanzler
-		if (g == last_chancell)
-			return 2;
-		// Mehr als 5 Spieler: Spieler ist letzter Präsident
-		if (g == last_president && gamers.size() > 5)
-			return 3;
-		return 0;
-	}
-
-	// Wenn der Pres. einen Kanzler nominiert werden alle zur Wahl aufgerufen
-	public void nominateAsChancellor(Gamer nominee) {
-		clearChat();
-		
-		chancell = nominee;
-		FileConfiguration c = Main.i.saves.config;
-		sendMessage(c.getString("tr.game.vote"), ChatColor.BLUE, true);
-		sendMessage(c.getString("tr.game.votehelp"), ChatColor.BLUE);
-		gamestate = 1;
-
-		// Lösche alle Wahlabgaben
-		for (Gamer g : gamers)
-			g.vote = -1;
-		
-		updateSidebar();
-	}
-
-	// Wenn ein Spieler wählt, wird überprüft, ob alle abgestimmt haben.
-	public void updateVoting() {
-		for (Gamer g : gamers) {
-			if (g.vote == -1)
-				return;
-		}
-		FileConfiguration c = Main.i.saves.config;
-		
-		clearChat();
-		
-		// Alle Spieler haben ihre Stimme abgegeben
-		gamestate = -1;
-		sendMessage(c.getString("tr.game.result"), ChatColor.BLUE, true);
-		String msg = "";
-		int n = 0;
-		int jas = 0;
-		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
-		for (Gamer g : gamers) {
-			msg += ChatColor.RESET + g.longName + ": ";
-			if (g.vote == 0)
-				msg += c.getString("tr.game.result_nein");
-			else {
-				msg += c.getString("tr.game.result_ja");
-				jas++;
-			}
-			msg += "   ";
-			n++;
-			if (n == 2) {
-				sendMessage(msg, ChatColor.WHITE);
-				msg = "";
-				n = 0;
-			}
-		}
-		if (msg != "")
-			sendMessage(msg, ChatColor.WHITE);
-
-		if (jas > gamers.size() / 2) {
-			// Wahl ist angenommen
-			sendMessage(c.getString("tr.game.vote_sucessf"), ChatColor.BLUE);
-			voting_sucessf();
-		} else {
-			// Wahl wurde abgelehnt
-			sendMessage(c.getString("tr.game.vote_failed"), ChatColor.BLUE);
-			voting_failed();
-		}
-	}
-
-	// Wenn die Wahl abgelehnt wurde
-	private void voting_failed() {
-		election_tracker++;
-		setElectionTracker();
-		chancell = null;
-		updateSidebar();
-
-		// Warte 5 sec
-		Main.i.delayedTask(new Runnable() {
-			@Override
-			public void run() {
-				if (election_tracker == 3) {
-					// Der ElectionTracker ist voll, Policy aufdecken!
-					election_tracker_full();
-				} else {
-					setNewPresident();
-				}
-			}
-		}, 20 * 5);
-	}
-
-	private void election_tracker_full() {
-		sendMessage(Main.i.saves.config.getString("tr.game.et_full"), ChatColor.BLUE, true);
-		Card c = deck.getOneCard(this, true);
-
-		placeCard(c);
-
-		election_tracker = 0;
-		last_chancell = null;
-
-		setElectionTracker();
-
-		if (checkGameEnds(null, true))
-			return;
-
-		// Beginne eine neue Runde!
-		Main.i.delayedTask(new Runnable() {
-			@Override
-			public void run() {
-				setNewPresident();
-			}
-		}, 5 * 20);
-	}
-
-	// Lege eine Karte auf das Brett, checkEndGame muss noch gemacht werden!
-	private void placeCard(Card c) {
-		if (c == Main.i.cardmgr.cards.get("plc_liberal"))
-			lib_plc_placed++;
-		else {
-			fac_plc_placed++;
-			if (fac_plc_placed == 3)
-				sendMessage(Main.i.saves.config.getString("tr.game.warn_chancell"), ChatColor.BLUE);
-		}
-		setItemFrames();
-	}
-
-	// Wenn die Wahl angenommen wird
-	private void voting_sucessf() {
-		// Check: Spiel zu ende durch die Wahl von Hitler
-		if (checkGameEnds(null, false))
-			return;
-
-		updateSidebar();
-		
-		// Setze den ET zurück
-		election_tracker = 0;
-		setElectionTracker();
-
-		sendMessage(Main.i.saves.config.getString("tr.game.presd_draws"), ChatColor.BLUE, true);
-		Card[] cards = deck.getThreeCards(this);
-		giveGamerCards(president, cards);
-		gamestate = 2;
-		president.sendMessage(
-				formatMessage(Main.i.saves.config.getString("tr.game.presd_discard"), ChatColor.BLUE, false));
-	}
-
+	
+	
+	
+	
+	
 	// Gebe die Spieler Karten, trage diese in policies und plcsIS ein
 	private void giveGamerCards(Gamer g, Card[] cards) {
 		g.plcsIS = new ArrayList<>();
@@ -827,7 +334,7 @@ public class Room {
 
 		// Lege die andere auf das Board
 		int fac_placed_before = fac_plc_placed;
-		placeCard(setc);
+		Main.i.gamemgr.placeCard(this, setc);
 
 		sendMessage(fc.getString("tr.game.chan_places"), ChatColor.BLUE, true);
 
@@ -836,6 +343,8 @@ public class Room {
 		if (checkGameEnds(null, true))
 			return;
 
+		Room r = this;
+		
 		if (fac_placed_before != fac_plc_placed) {
 			// Es wurde eine faschistische Karte gelegt
 			checkPresidentialPower();
@@ -843,7 +352,7 @@ public class Room {
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
-					setNewPresident();
+					Main.i.vtmgr.setNewPresident(r);
 				}
 			}, 20 * 5);
 		}
@@ -873,10 +382,12 @@ public class Room {
 		clearChat();
 		sendMessage(Main.i.saves.config.getString("tr.game.accept"), ChatColor.BLUE, true);
 		election_tracker++;
-		setElectionTracker();
+		Main.i.rooms.setElectionTracker(this);
 
 		gamestate = -1;
 
+		Room r = this;
+		
 		// Warte 5 sec
 		Main.i.delayedTask(new Runnable() {
 			@Override
@@ -886,7 +397,7 @@ public class Room {
 					chancell = null;
 					election_tracker_full();
 				} else {
-					setNewPresident();
+					Main.i.vtmgr.setNewPresident(r);
 				}
 			}
 		}, 20 * 5);
@@ -900,6 +411,7 @@ public class Room {
 	// Wenn eine faschitische Karte gelegt wird, wird die presidential power
 	// überprüft
 	private void checkPresidentialPower() {
+		Room r = this;
 		FileConfiguration c = Main.i.saves.config;
 		Card card = facist_board[fac_plc_placed - 1];
 		if (card == Main.i.cardmgr.cards.get("brd_invest")) {
@@ -928,7 +440,7 @@ public class Room {
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
-					setNewPresident();
+					Main.i.vtmgr.setNewPresident(r);
 				}
 			}, 20 * 5);
 		} else if (card == Main.i.cardmgr.cards.get("brd_kill") || card == Main.i.cardmgr.cards.get("brd_veto")) {
@@ -942,7 +454,7 @@ public class Room {
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
-					setNewPresident();
+					Main.i.vtmgr.setNewPresident(r);
 				}
 			}, 20 * 5);
 		}
@@ -964,10 +476,12 @@ public class Room {
 				c.getString("tr.game.power.invest.result").replaceAll("#name", g.name).replaceAll("#party", party),
 				ChatColor.BLUE, false));
 
+		Room r = this;
+		
 		Main.i.delayedTask(new Runnable() {
 			@Override
 			public void run() {
-				setNewPresident();
+				Main.i.vtmgr.setNewPresident(r);
 			}
 		}, 20 * 5);
 	}
@@ -977,8 +491,8 @@ public class Room {
 		clearChat();
 		gamestate = -1;
 		// Wenn der nächste gewählt wurde, geht es normal weiter
-		if (g == nextGamer(president)) {
-			setNewPresident();
+		if (g == Main.i.gamemgr.nextGamer(this, president)) {
+			Main.i.vtmgr.setNewPresident(this);
 			return;
 		}
 
@@ -990,7 +504,7 @@ public class Room {
 		president = g;
 		sendMessage(Main.i.saves.config.getString("tr.game.pres_was_elected"), ChatColor.BLUE, true);
 
-		updateSidebar();
+		Main.i.rooms.updateSidebar(this);
 		
 		president.sendChancellElectionMessage(this);
 	}
@@ -1003,15 +517,16 @@ public class Room {
 		sendMessage(c.getString("tr.game.power.kill.kill").replaceAll("#name", g.longName), ChatColor.BLUE, true);
 		gamers.remove(g);
 		g.state = 0;
-		updateSidebar();
+		Main.i.rooms.updateSidebar(this);
 
 		if (checkGameEnds(g, true))
 			return;
 
+		Room r = this;
 		Main.i.delayedTask(new Runnable() {
 			@Override
 			public void run() {
-				setNewPresident();
+				Main.i.vtmgr.setNewPresident(r);
 			}
 		}, 20 * 5);
 
@@ -1019,7 +534,7 @@ public class Room {
 	}
 
 	// Überprüfe alle Möglichkeiten des Endes des Spieles
-	private boolean checkGameEnds(Gamer killed, boolean ignoreHitler) {
+	public boolean checkGameEnds(Gamer killed, boolean ignoreHitler) {
 		// Wenn Hitler stirbt wird hier nicht beachtet!
 		FileConfiguration c = Main.i.saves.config;
 		int win = -1;
@@ -1067,7 +582,7 @@ public class Room {
 		return true;
 	}
 
-	private void openSecretRoles() {
+	public void openSecretRoles() {
 		FileConfiguration c = Main.i.saves.config;
 		sendMessage(c.getString("tr.game.end.roles"), ChatColor.BLUE, true);
 		String msg = "";
@@ -1094,39 +609,15 @@ public class Room {
 		if (msg != "")
 			sendMessage(msg, ChatColor.WHITE);
 
+		Room r = this;
 		// Beende das Spiel
 		Main.i.delayedTask(new Runnable() {
 			@Override
 			public void run() {
-				resetRoom();
+				Main.i.rooms.resetRoom(r);
 			}
 		}, 20 * 5);
 	}
 
-	private void updateSidebar() {
-		FileConfiguration c = Main.i.saves.config;
-		sbar.clear();
-		
-		for (int i=0; i<all_gamers.size(); i++) {
-			Gamer g = all_gamers.get(i);
-			String s = g.longName;
-			
-			if (g.state != 1)
-				s = c.getString("config.game.dead_color") + g.longName;
-			else if (president == g)
-				s = c.getString("config.game.presd_color") + g.longName + " " + c.getString("config.game.presd_abbr");
-			else if (chancell == g)
-				s = c.getString("config.game.chanc_color") + g.longName + " " + c.getString("config.game.chanc_abbr");
-			else if (last_chancell == g)
-				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lchanc_abbr");
-			else if (last_president == g && gamers.size() > 5)
-				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lpresd_abbr");
-		
-			sbar.setEntry(i, s);
-		}
-		
-		for (Gamer g : all_gamers)
-			sbar.addToPlayer(g.player);
-	}
 	
 }

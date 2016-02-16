@@ -63,14 +63,14 @@ public class GamerMgr {
 				gamers.remove(g);
 				
 				if (g.joinedRoom != null)
-					g.joinedRoom.quit(g);
+					Main.i.rooms.quitRoom(g.joinedRoom, g);
 				
 				if (g.dummies != null) {
 					for (Gamer d : g.dummies) {
 						d.saveYAML();
 						gamers.remove(d);
 						if (d.joinedRoom != null)
-							d.joinedRoom.quit(d);
+							Main.i.rooms.quitRoom(d.joinedRoom, d);
 					}
 				}
 				

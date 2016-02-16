@@ -6,6 +6,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.robfro.secrethitler.game.CardMgr;
+import de.robfro.secrethitler.game.GameMgr;
+import de.robfro.secrethitler.game.VotingMgr;
 import de.robfro.secrethitler.gamer.GamerMgr;
 import de.robfro.secrethitler.general.AdminTools;
 import de.robfro.secrethitler.general.MyLib;
@@ -25,6 +27,8 @@ public class Main extends JavaPlugin {
 	public RoomMgr rooms;
 	public GamerMgr gamermgr;
 	public CardMgr cardmgr;
+	public GameMgr gamemgr;
+	public VotingMgr vtmgr;
 	
 	@Override
 	public void onEnable() {
@@ -38,6 +42,9 @@ public class Main extends JavaPlugin {
 		gamermgr.onPluginEnabled();
 		cardmgr = new CardMgr();
 		rooms = new RoomMgr();
+		gamemgr = new GameMgr();
+		vtmgr = new VotingMgr();
+		
 		// Starte den Listener
 		listener = new MyListener();
 		getServer().getPluginManager().registerEvents(listener, this);

@@ -69,16 +69,16 @@ public class AdminTools {
 				return true;
 			if (quitter.joinedRoom == null)
 				return true;
-			quitter.joinedRoom.quit(quitter);
+			Main.i.rooms.quitRoom(quitter.joinedRoom, quitter);
 			return true;
 		case "start":
 			Room r = Main.i.rooms.rooms.get("Raum1");
-			r.join(Main.i.gamermgr.getGamer("Dummy1"));
-			r.join(Main.i.gamermgr.getGamer("Dummy2"));
-			r.join(Main.i.gamermgr.getGamer("Dummy3"));
-			r.join(Main.i.gamermgr.getGamer("Dummy4"));
-			r.join(Main.i.gamermgr.getGamer("Dummy5"));
-
+			Main.i.rooms.joinRoom(r, Main.i.gamermgr.getGamer("Dummy1"));
+			Main.i.rooms.joinRoom(r, Main.i.gamermgr.getGamer("Dummy2"));
+			Main.i.rooms.joinRoom(r, Main.i.gamermgr.getGamer("Dummy3"));
+			Main.i.rooms.joinRoom(r, Main.i.gamermgr.getGamer("Dummy4"));
+			Main.i.rooms.joinRoom(r, Main.i.gamermgr.getGamer("Dummy5"));
+			
 			onCommandDUMMY(sender, command, label, new String[] { "0" });
 			onCommandWAIT(sender, command, label, new String[] { "0" });
 
@@ -99,7 +99,7 @@ public class AdminTools {
 			for (Gamer gam : g.dummies) {
 				gam.vote = v;
 			}
-			dg.joinedRoom.updateVoting();
+			Main.i.vtmgr.updateVoting(dg.joinedRoom);
 			return true;
 		}
 
