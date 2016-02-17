@@ -47,6 +47,8 @@ public class Gamer {
 	public int vote; // -1..not voted, 0..nein, 1..ja
 	public Card[] policies;
 	public ArrayList<ItemStack> plcsIS;
+	
+	public boolean freeze;
 
 
 	// EchterSpieler Konstruktor

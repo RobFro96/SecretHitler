@@ -20,7 +20,7 @@ public class RoomMgr {
 
 	public HashMap<String, Room> rooms;
 
-	public RoomMgr() {
+	public void load() {
 		rooms = new HashMap<>();
 		FileConfiguration c = Main.i.saves.rooms;
 
@@ -115,7 +115,7 @@ public class RoomMgr {
 			if (nominee == g || nominee.investigated)
 				return true;
 
-			r.investigate(nominee);
+			Main.i.pwrmgr.investigate(r, nominee);
 		} else if (r.gamestate == 6) {
 			// Wer nächster President?
 			// Check: President
@@ -125,7 +125,7 @@ public class RoomMgr {
 			if (nominee == g)
 				return true;
 
-			r.specialElection(nominee);
+			Main.i.pwrmgr.specialElection(r, nominee);
 		} else if (r.gamestate == 7) {
 			// Wer soll hingerichtet werden?
 			// Check: President
@@ -135,7 +135,7 @@ public class RoomMgr {
 			if (nominee == g)
 				return true;
 
-			r.executeGamer(nominee);
+			Main.i.pwrmgr.executeGamer(r, nominee);
 		}
 
 		return true;
@@ -163,7 +163,7 @@ public class RoomMgr {
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
-					g.joinedRoom.president_discard(c);
+					Main.i.plcmgr.president_discard(g.joinedRoom, c);
 				}
 			}, 5);
 			return true;
@@ -181,7 +181,7 @@ public class RoomMgr {
 			Main.i.delayedTask(new Runnable() {
 				@Override
 				public void run() {
-					g.joinedRoom.chanc_discard(c);
+					Main.i.plcmgr.chanc_discard(g.joinedRoom, c);
 				}
 			}, 5);
 			return true;
@@ -219,7 +219,7 @@ public class RoomMgr {
 			if (r.chancell != g)
 				return true;
 
-			r.chanc_veto();
+			Main.i.plcmgr.chanc_veto(r);
 			return true;
 		} else if (args.length == 1) {
 			// Presindent beantwortet die Veto-Anfrage
@@ -232,9 +232,9 @@ public class RoomMgr {
 				return true;
 
 			if (args[0].equals("1")) {
-				r.presd_veto_accept();
+				Main.i.plcmgr.presd_veto_accept(r);
 			} else {
-				r.presd_veto_deny();
+				Main.i.plcmgr.presd_veto_deny(r);
 			}
 
 			return true;
@@ -292,13 +292,13 @@ public class RoomMgr {
 			if (r.all_gamers.contains(g)) {
 				r.all_gamers.remove(g);
 				r.gamers.remove(g);
-				r.checkGameEnds(g, false);
+				Main.i.gamemgr.checkGameEnds(r, g, false);
 				if (r.gamers.size() >= 3) {
 					if (g == r.president || g == r.chancell)
 						Main.i.vtmgr.setNewPresident(r);
 				} else if (r.gamers.size() == 2) {
 					r.sendMessage(c.getString("tr.game.end.lessplayer"), ChatColor.BLUE, true);
-					r.openSecretRoles();
+					Main.i.gamemgr.openSecretRoles(r);
 				} else {
 					resetRoom(r);
 				}
@@ -336,14 +336,12 @@ public class RoomMgr {
 		// Entfernt Spieler, wenn vorhanden
 		if (r.all_gamers != null) {
 			for (Gamer g : r.all_gamers) {
-				if (g.state != 0) {
-					g.player.setScoreboard(Main.i.getServer().getScoreboardManager().getNewScoreboard());
-					g.getInventory().clear();
-					g.state = 0;
-					g.joinedRoom = null;
-					if (!g.isDummy)
-						g.player.teleport(Main.i.saves.spawnPoint);
-				}
+				g.player.setScoreboard(Main.i.getServer().getScoreboardManager().getNewScoreboard());
+				g.getInventory().clear();
+				g.state = 0;
+				g.joinedRoom = null;
+				if (!g.isDummy)
+					g.player.teleport(Main.i.saves.spawnPoint);
 			}
 		}
 
@@ -355,7 +353,10 @@ public class RoomMgr {
 		r.fac_plc_placed = 0;
 		r.lib_plc_placed = 0;
 		r.playing = false;
-
+		r.president = null;
+		r.chancell = null;
+		r.last_chancell = null;
+		r.last_president = null;
 
 		setElectionTracker(r);
 		setItemFrames(r);
@@ -399,11 +400,11 @@ public class RoomMgr {
 	public void updateSidebar(Room r) {
 		FileConfiguration c = Main.i.saves.config;
 		r.sbar.clear();
-		
-		for (int i=0; i<r.all_gamers.size(); i++) {
+
+		for (int i = 0; i < r.all_gamers.size(); i++) {
 			Gamer g = r.all_gamers.get(i);
 			String s = g.longName;
-			
+
 			if (g.state != 1)
 				s = c.getString("config.game.dead_color") + g.longName;
 			else if (r.president == g)
@@ -414,13 +415,20 @@ public class RoomMgr {
 				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lchanc_abbr");
 			else if (r.last_president == g && r.gamers.size() > 5)
 				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lpresd_abbr");
-		
+			
+			if (r.gamestate == 1) {
+				if (g.vote == -1)
+					s = "[ ] " + s;
+				else
+					s = "[X] " + s;
+			}
+			
 			r.sbar.setEntry(i, s);
 		}
-		
+
 		for (Gamer g : r.all_gamers)
 			r.sbar.addToPlayer(g.player);
 	}
-	
+
 
 }

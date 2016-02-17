@@ -31,7 +31,7 @@ public class SaveMgr {
 	public SaveMgr() {
 		// CONFIG
 		configFile = new File(Main.i.getDataFolder(), "config.yml");
-		configFile.delete();
+		//configFile.delete();
 		config = YamlConfiguration.loadConfiguration(configFile);
 		setupDefaults();
 		loadSettings();
@@ -95,6 +95,8 @@ public class SaveMgr {
 
 		config.addDefault("tr.info.disable_dummy", "Du bist jetzt du selber.");
 		config.addDefault("tr.info.change_dummy", "Du hast auf folgenden Dummy gewechselt: ");
+		config.addDefault("tr.info.freeze", "Der Spieler wurde eingefroren.");
+		config.addDefault("tr.info.defrost", "Der Spieler wurde aufgetaut.");
 
 		config.addDefault("tr.lobby.welcome", "Willkommen auf RobFros-Secret-Hitler-Server!");
 		config.addDefault("tr.lobby.current_longname", "Aktueller seriöser Name: ");
@@ -200,10 +202,12 @@ public class SaveMgr {
 		config.addDefault("tr.game.end.hitlerelected",
 				"Hitler zum Kanzler gewählt wurde, nachdem mindestens drei faschistische Artikel lagen.");
 		config.addDefault("tr.game.end.roles", "Hier siehst du die Rollenverteilung in diesem Spiel: ");
-		config.addDefault("tr.game.end.lessplayer", "Das Spiel musste beendet werden, da zu wenige Spieler noch da sind.");
-		config.addDefault("tr.game.warn_chancell", "Achtung! Es liegen drei Faschistische Artikel. Sollte nun Hitler zum Kanzler gewählt werden, so kommt es zur Machtergreifung.");
+		config.addDefault("tr.game.end.lessplayer",
+				"Das Spiel musste beendet werden, da zu wenige Spieler noch da sind.");
+		config.addDefault("tr.game.warn_chancell",
+				"Achtung! Es liegen drei Faschistische Artikel. Sollte nun Hitler zum Kanzler gewählt werden, so kommt es zur Machtergreifung.");
 
-		
+
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
@@ -211,6 +215,7 @@ public class SaveMgr {
 		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
 		config.addDefault("tr.command.nominate", "Wird genutz, um einen Spieler zu nominieren.");
 		config.addDefault("tr.command.veto", "Wird genutzt, um in Veto zu gehen.");
+		config.addDefault("tr.command.frz", "Friere einen Spieler ein oder taue diesen wieder auf.");
 
 		config.addDefault("tr.maps.plc_liberal", "Liberaler Artikel");
 		config.addDefault("tr.maps.plc_facist", "Faschistischer Artikel");
@@ -247,12 +252,12 @@ public class SaveMgr {
 
 		config.addDefault("config.game.liberal_plcs", 6);
 		config.addDefault("config.game.facist_plcs", 11);
-		config.addDefault("config.game.presd_color", ChatColor.DARK_GREEN);
+		config.addDefault("config.game.presd_color", ChatColor.DARK_GREEN.toString());
 		config.addDefault("config.game.presd_abbr", "[P]");
-		config.addDefault("config.game.chanc_color", ChatColor.GOLD);
+		config.addDefault("config.game.chanc_color", ChatColor.GOLD.toString());
 		config.addDefault("config.game.chanc_abbr", "[K]");
-		config.addDefault("config.game.last_color", ChatColor.GRAY);
-		config.addDefault("config.game.dead_color", ChatColor.DARK_GRAY);
+		config.addDefault("config.game.last_color", ChatColor.GRAY.toString());
+		config.addDefault("config.game.dead_color", ChatColor.DARK_GRAY.toString());
 		config.addDefault("config.game.lchanc_abbr", "[lK]");
 		config.addDefault("config.game.lpresd_abbr", "[lP]");
 

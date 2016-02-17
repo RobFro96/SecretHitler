@@ -1,5 +1,6 @@
 package de.robfro.secrethitler.general;
 
+import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
@@ -99,5 +101,16 @@ public class MyListener implements Listener {
 			return;
 		e.setCancelled(true);
 		Main.i.mylib.sendError(e.getPlayer(), "drop_item");
+	}
+	
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent e) {
+		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
+			return;
+		Gamer g = Main.i.gamermgr.getGamer(e.getPlayer().getName());
+		if (g.freeze) {
+			e.setCancelled(true);
+			e.getPlayer().teleport(new Location(e.getFrom().getWorld(), e.getFrom().getBlockX(), e.getFrom().getBlockY(), e.getFrom().getBlockZ()));
+		}
 	}
 }

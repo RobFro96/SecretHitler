@@ -19,3 +19,6 @@ commands:
     usage: '/<command> NAME'
   veto:
     usage: '/<command> [0|1]'
+  frz:
+    usage: '/<command> NAME'
+    aliases: [freeze]

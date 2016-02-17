@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
-
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.gamer.Gamer;
 import de.robfro.secrethitler.world.Room;
@@ -383,6 +382,36 @@ public class AdminTools {
 		g.joinedRoom.waiting_time = time;
 		g.joinedRoom.onTimerOneSecond();
 
+		return true;
+	}
+
+	public boolean onCommandFRZ(CommandSender sender, Command command, String label, String[] args) {
+		// CHECK: Admin
+		if (!sender.hasPermission("sh.admin")) {
+			Main.i.mylib.sendError(sender, "no_permission");
+			return true;
+		}
+		
+		// Argumente
+		if (args.length != 1) {
+			Main.i.mylib.sendError(sender, "number_args");
+			return true;
+		}
+		
+		Gamer g = Main.i.mylib.getGamerFromName(args[0]);
+		if (g == null) {
+			Main.i.mylib.sendError(sender, "not_a_player");
+			return true;
+		}
+		
+		if (g.freeze) {
+			g.freeze = false;
+			Main.i.mylib.sendInfo(sender, "defrost");
+		} else {
+			g.freeze = true;
+			Main.i.mylib.sendInfo(sender, "freeze");
+		}
+		
 		return true;
 	}
 }

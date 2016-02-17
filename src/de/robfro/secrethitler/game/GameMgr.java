@@ -188,5 +188,90 @@ public class GameMgr {
 		Main.i.rooms.setItemFrames(r);
 	}
 
+	// Überprüfe alle Möglichkeiten des Endes des Spieles
+		public boolean checkGameEnds(Room r, Gamer killed, boolean ignoreHitler) {
+			// Wenn Hitler stirbt wird hier nicht beachtet!
+			FileConfiguration c = Main.i.saves.config;
+			int win = -1;
+			String cause = "";
+			if (r.lib_plc_placed >= 5) {
+				win = 0;
+				cause = c.getString("tr.game.end.libplcs");
+			}
+			if (killed != null) {
+				if (killed.role == Role.HITLER) {
+					win = 0;
+					cause = c.getString("tr.game.end.killhitler");
+				}
+			}
+			if (r.fac_plc_placed >= 6) {
+				win = 1;
+				cause = c.getString("tr.game.end.facplcs");
+			}
+			if (r.chancell != null && !ignoreHitler) {
+				if (r.chancell.role == Role.HITLER && r.fac_plc_placed >= 3) {
+					win = 1;
+					cause = c.getString("tr.game.end.hitlerelected");
+				}
+			}
+
+			if (win == -1)
+				return false;
+
+			if (win == 0) {
+				r.sendMessage(c.getString("tr.game.end.libwin") + cause, ChatColor.BLUE, true);
+			} else {
+				r.sendMessage(c.getString("tr.game.end.facwin") + cause, ChatColor.BLUE, true);
+			}
+
+			Main.i.getLogger().info("Game ended in " + r.name + ".");
+
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					openSecretRoles(r);
+				}
+			}, 20 * 5);
+
+
+			return true;
+		}
+
+		public void openSecretRoles(Room r) {
+			FileConfiguration c = Main.i.saves.config;
+			r.sendMessage(c.getString("tr.game.end.roles"), ChatColor.BLUE, true);
+			String msg = "";
+			int n = 0;
+
+			// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
+			for (Gamer g : r.all_gamers) {
+				msg += ChatColor.RESET + g.longName + ": ";
+				if (g.role == Role.FACIST)
+					msg += c.getString("tr.pregame.rl_facist");
+				else if (g.role == Role.HITLER)
+					msg += c.getString("tr.pregame.rl_hitler");
+				else
+					msg += c.getString("tr.pregame.rl_liberal");
+
+				msg += "   ";
+				n++;
+				if (n == 2) {
+					r.sendMessage(msg, ChatColor.WHITE);
+					msg = "";
+					n = 0;
+				}
+			}
+			if (msg != "")
+				r.sendMessage(msg, ChatColor.WHITE);
+
+			// Beende das Spiel
+			Main.i.delayedTask(new Runnable() {
+				@Override
+				public void run() {
+					Main.i.rooms.resetRoom(r);
+				}
+			}, 20 * 5);
+		}
+
 
 }

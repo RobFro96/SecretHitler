@@ -7,6 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import de.robfro.secrethitler.game.CardMgr;
 import de.robfro.secrethitler.game.GameMgr;
+import de.robfro.secrethitler.game.PolicyMgr;
+import de.robfro.secrethitler.game.PowerMgr;
 import de.robfro.secrethitler.game.VotingMgr;
 import de.robfro.secrethitler.gamer.GamerMgr;
 import de.robfro.secrethitler.general.AdminTools;
@@ -29,6 +31,8 @@ public class Main extends JavaPlugin {
 	public CardMgr cardmgr;
 	public GameMgr gamemgr;
 	public VotingMgr vtmgr;
+	public PolicyMgr plcmgr;
+	public PowerMgr pwrmgr;
 	
 	@Override
 	public void onEnable() {
@@ -41,9 +45,12 @@ public class Main extends JavaPlugin {
 		gamermgr = new GamerMgr();
 		gamermgr.onPluginEnabled();
 		cardmgr = new CardMgr();
-		rooms = new RoomMgr();
 		gamemgr = new GameMgr();
 		vtmgr = new VotingMgr();
+		plcmgr = new PolicyMgr();
+		pwrmgr = new PowerMgr();
+		rooms = new RoomMgr();
+		rooms.load();
 		
 		// Starte den Listener
 		listener = new MyListener();
@@ -83,6 +90,9 @@ public class Main extends JavaPlugin {
 			return rooms.onCommandNOMINATE(sender, command, label, args);
 		case "veto":
 			return rooms.onCommandVETO(sender, command, label, args);
+		case "frz":
+		case "freeze":
+			return admintools.onCommandFRZ(sender, command, label, args);
 		}
 			
 		
