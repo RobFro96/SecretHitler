@@ -74,14 +74,20 @@ public class VotingMgr {
 	}
 
 	// Wenn ein Spieler wählt, wird überprüft, ob alle abgestimmt haben.
-	public void updateVoting(Room r) {
+	public void updateVoting(Room r, Gamer voted) {
 		Main.i.rooms.updateSidebar(r);
+		long last = r.lastUpdate;
+		r.lastUpdate = System.currentTimeMillis();
 		for (Gamer g : r.gamers) {
 			if (g.vote == -1)
 				return;
 		}
 		FileConfiguration c = Main.i.saves.config;
 
+		if (last + 5000 < r.lastUpdate) {
+			voted.stats.tlast++;
+		}
+		
 		r.clearChat();
 
 		// Alle Spieler haben ihre Stimme abgegeben
@@ -143,7 +149,12 @@ public class VotingMgr {
 	}
 
 	// Wenn die Wahl angenommen wird
+	
 	public void voting_sucessf(Room r) {
+		// Statics
+		r.president.stats.tPresd++;
+		r.chancell.stats.tChanc++;
+		
 		// Check: Spiel zu ende durch die Wahl von Hitler
 		if (Main.i.gamemgr.checkGameEnds(r, null, false))
 			return;

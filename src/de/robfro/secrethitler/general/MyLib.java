@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.inventory.InventoryType;
@@ -174,6 +175,17 @@ public class MyLib {
 		return (ItemFrame) e;
 	}
 
+	public ArmorStand getArmorStandInLocation(Location loc) {
+		ArrayList<Entity> es = new ArrayList<>(loc.getWorld().getNearbyEntities(loc, .5f, .5f, .5f));
+		
+		for (Entity e : es) {
+			if (e instanceof ArmorStand)
+				return (ArmorStand)e;
+		}
+		return null;
+	}
+
+	
 	public Sign getSignInLocation(Location loc) {
 		BlockState bs = loc.getBlock().getState();
 		if (bs instanceof Sign)

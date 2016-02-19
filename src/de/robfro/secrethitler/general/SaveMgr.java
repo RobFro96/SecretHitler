@@ -31,7 +31,7 @@ public class SaveMgr {
 	public SaveMgr() {
 		// CONFIG
 		configFile = new File(Main.i.getDataFolder(), "config.yml");
-		//configFile.delete();
+		configFile.delete();
 		config = YamlConfiguration.loadConfiguration(configFile);
 		setupDefaults();
 		loadSettings();
@@ -70,9 +70,12 @@ public class SaveMgr {
 		config.addDefault("tr.error.not_presd", "Nur den Präsident darf diesen Befehl ausführen.");
 		config.addDefault("tr.error.not_a_player", "Das Argument verweist auf keinen Spieler.");
 		config.addDefault("tr.error.cant_nominated", "Dieser Spieler kann nicht nominiert werden.");
+		
+		config.addDefault("tr.error.room_hm", "Es wurde kein ArmorStand gefunden.");
 
 		config.addDefault("tr.info.room_created", "Der Raum wurde erfolgreich erstellt.");
 		config.addDefault("tr.info.room_spawn", "Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.");
+		config.addDefault("tr.info.room_hm", "Der HangMan des Raumes wurde erfolgreich festgelegt.");
 		config.addDefault("tr.info.room_material", "Das ElectionTracke-Material wurde erfolgreich festgelegt.");
 		config.addDefault("tr.info.room_click", "Klicke links als nächste auf: ");
 		config.addDefault("tr.info.room_if0", "ItemFrameFacists1");
@@ -206,12 +209,26 @@ public class SaveMgr {
 				"Das Spiel musste beendet werden, da zu wenige Spieler noch da sind.");
 		config.addDefault("tr.game.warn_chancell",
 				"Achtung! Es liegen drei Faschistische Artikel. Sollte nun Hitler zum Kanzler gewählt werden, so kommt es zur Machtergreifung.");
-
+		
+		config.addDefault("tr.stats.title", "STATISTIK von #name");
+		config.addDefault("tr.stats.games", "Gespielte Spiele: ");
+		config.addDefault("tr.stats.lib", "Liberal: ");
+		config.addDefault("tr.stats.fac", "Faschist: ");
+		config.addDefault("tr.stats.hitler", "Hitler: ");
+		config.addDefault("tr.stats.won", "Gewonnene Spiele: ");
+		config.addDefault("tr.stats.tpresd", "Präsindentschaften: ");
+		config.addDefault("tr.stats.tchanc", "Kanzlerschaften: ");
+		config.addDefault("tr.stats.killedsb", "Hinrichtungen: ");
+		config.addDefault("tr.stats.waskilled", "Tode: ");
+		config.addDefault("tr.stats.tlast", "Letzter in Abstimmung: ");
+		config.addDefault("tr.stats.welcome", "Zeige deine Statistik an: ");
+		config.addDefault("tr.stats.welcome_here", "[HIER]");
 
 		config.addDefault("tr.command.test", "Teste als Admin die eines Unterprogramms.");
 		config.addDefault("tr.command.room", "Bearbeite oder erstelle einen Raum.");
 		config.addDefault("tr.command.dummy", "Wechsele auf eine Dummy oder zurück zu dir selbst.");
 		config.addDefault("tr.command.chgnm", "Ändere deinen seriösen Namen mit diesem Befehl.");
+		config.addDefault("tr.command.stats", "Schau dir deine Statistik oder die eines anderen Spielers an.");
 		config.addDefault("tr.command.wait", "Setze als Admin die Wartezeit innerhalb eines Raumes.");
 		config.addDefault("tr.command.nominate", "Wird genutz, um einen Spieler zu nominieren.");
 		config.addDefault("tr.command.veto", "Wird genutzt, um in Veto zu gehen.");

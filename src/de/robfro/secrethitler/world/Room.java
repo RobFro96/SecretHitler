@@ -3,11 +3,21 @@ package de.robfro.secrethitler.world;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.game.Card;
@@ -26,7 +36,7 @@ public class Room {
 	public String name;
 	public Location[] itemFrameLocations;
 	public Location[] electionTracker;
-	public Location spawn, signloc;
+	public Location spawn, signloc, hmloc;
 	public Sign sign;
 	public String et_material1, et_material2;
 	public boolean all_right;
@@ -60,6 +70,9 @@ public class Room {
 	public boolean veto_power;
 	
 	public Sidebar sbar;
+	
+	// Für die Stats:
+	public long lastUpdate;
 
 	// Lade einen Raum aus der YAML
 	public Room(FileConfiguration c, String key) {
@@ -101,6 +114,8 @@ public class Room {
 			Main.i.getLogger().warning("Spawn is not defined in " + key + ".");
 			all_right = false;
 		}
+		
+		hmloc = MyLib.ParseLocation(c.getString(key + ".hm"));
 
 		signloc = MyLib.ParseLocation(c.getString(key + ".sign"));
 		if (signloc != null) {
@@ -158,6 +173,7 @@ public class Room {
 
 		c.set(name + ".et_material1", et_material1);
 		c.set(name + ".et_material2", et_material2);
+		c.set(name + ".hm", MyLib.LocationToString(hmloc));
 	}
 
 	// Sendet eine Nachricht an alle Spieler in diesem Raum
@@ -238,6 +254,28 @@ public class Room {
 		return c.getInt("config.wait.wait_at_min") - (cnt - min) * c.getInt("config.wait.less_per_player");
 	}
 
+	public void setHead(String name, boolean rocket) {
+		if (hmloc == null)
+			return;
+		ArmorStand as = Main.i.mylib.getArmorStandInLocation(hmloc);
+		if (as == null)
+			return;
+		ItemStack is = new ItemStack(Material.SKULL_ITEM, 1, (byte)3);
+		SkullMeta meta = (SkullMeta)is.getItemMeta();
+		meta.setOwner(name);
+		is.setItemMeta(meta);
+		as.setHelmet(is);
+		
+		if (rocket) {
+			Firework fw = (Firework) as.getWorld().spawnEntity(as.getLocation(), EntityType.FIREWORK);
+			FireworkMeta fm = fw.getFireworkMeta();
+			 			 
+			FireworkEffect effect = FireworkEffect.builder().withColor(Color.RED).with(Type.BALL_LARGE).build();
+			fm.addEffect(effect);
+			fm.setPower(0);
+			fw.setFireworkMeta(fm);
+		}
+	}
 	
 	
 	

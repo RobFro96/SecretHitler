@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.potion.PotionEffectType;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.gamer.Gamer;
@@ -30,6 +31,7 @@ public class GameMgr {
 			g.getInventory().clear();
 			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_ja").getItemStack(true));
 			g.getInventory().addItem(Main.i.cardmgr.cards.get("vt_nein").getItemStack(true));
+			g.player.removePotionEffect(PotionEffectType.INVISIBILITY);
 		}
 
 		// Initialisiere das Brett
@@ -56,6 +58,8 @@ public class GameMgr {
 		giveRoleCards(r);
 
 		r.clearChat();
+		
+		r.setHead("MHF_Skeleton", false);
 
 		// Sende die Nachricht an alle Spieler
 		for (Gamer g : r.gamers)
@@ -189,89 +193,92 @@ public class GameMgr {
 	}
 
 	// Überprüfe alle Möglichkeiten des Endes des Spieles
-		public boolean checkGameEnds(Room r, Gamer killed, boolean ignoreHitler) {
-			// Wenn Hitler stirbt wird hier nicht beachtet!
-			FileConfiguration c = Main.i.saves.config;
-			int win = -1;
-			String cause = "";
-			if (r.lib_plc_placed >= 5) {
+	public boolean checkGameEnds(Room r, Gamer killed, boolean ignoreHitler) {
+		// Wenn Hitler stirbt wird hier nicht beachtet!
+		FileConfiguration c = Main.i.saves.config;
+		int win = -1;
+		String cause = "";
+		if (r.lib_plc_placed >= 5) {
+			win = 0;
+			cause = c.getString("tr.game.end.libplcs");
+		}
+		if (killed != null) {
+			if (killed.role == Role.HITLER) {
 				win = 0;
-				cause = c.getString("tr.game.end.libplcs");
+				cause = c.getString("tr.game.end.killhitler");
 			}
-			if (killed != null) {
-				if (killed.role == Role.HITLER) {
-					win = 0;
-					cause = c.getString("tr.game.end.killhitler");
-				}
-			}
-			if (r.fac_plc_placed >= 6) {
+		}
+		if (r.fac_plc_placed >= 6) {
+			win = 1;
+			cause = c.getString("tr.game.end.facplcs");
+		}
+		if (r.chancell != null && !ignoreHitler) {
+			if (r.chancell.role == Role.HITLER && r.fac_plc_placed >= 3) {
 				win = 1;
-				cause = c.getString("tr.game.end.facplcs");
+				cause = c.getString("tr.game.end.hitlerelected");
 			}
-			if (r.chancell != null && !ignoreHitler) {
-				if (r.chancell.role == Role.HITLER && r.fac_plc_placed >= 3) {
-					win = 1;
-					cause = c.getString("tr.game.end.hitlerelected");
-				}
-			}
-
-			if (win == -1)
-				return false;
-
-			if (win == 0) {
-				r.sendMessage(c.getString("tr.game.end.libwin") + cause, ChatColor.BLUE, true);
-			} else {
-				r.sendMessage(c.getString("tr.game.end.facwin") + cause, ChatColor.BLUE, true);
-			}
-
-			Main.i.getLogger().info("Game ended in " + r.name + ".");
-
-			Main.i.delayedTask(new Runnable() {
-				@Override
-				public void run() {
-					openSecretRoles(r);
-				}
-			}, 20 * 5);
-
-
-			return true;
 		}
 
-		public void openSecretRoles(Room r) {
-			FileConfiguration c = Main.i.saves.config;
-			r.sendMessage(c.getString("tr.game.end.roles"), ChatColor.BLUE, true);
-			String msg = "";
-			int n = 0;
+		if (win == -1)
+			return false;
 
-			// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
-			for (Gamer g : r.all_gamers) {
-				msg += ChatColor.RESET + g.longName + ": ";
-				if (g.role == Role.FACIST)
-					msg += c.getString("tr.pregame.rl_facist");
-				else if (g.role == Role.HITLER)
-					msg += c.getString("tr.pregame.rl_hitler");
-				else
-					msg += c.getString("tr.pregame.rl_liberal");
+		// Statistics
+		for (Gamer g : r.all_gamers)
+			g.stats.endGame(win, g);
+		
+		if (win == 0) {
+			r.sendMessage(c.getString("tr.game.end.libwin") + cause, ChatColor.BLUE, true);
+		} else {
+			r.sendMessage(c.getString("tr.game.end.facwin") + cause, ChatColor.BLUE, true);
+		}
 
-				msg += "   ";
-				n++;
-				if (n == 2) {
-					r.sendMessage(msg, ChatColor.WHITE);
-					msg = "";
-					n = 0;
-				}
+		Main.i.getLogger().info("Game ended in " + r.name + ".");
+
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				openSecretRoles(r);
 			}
-			if (msg != "")
+		}, 20 * 5);
+
+		return true;
+	}
+
+	public void openSecretRoles(Room r) {
+		FileConfiguration c = Main.i.saves.config;
+		r.sendMessage(c.getString("tr.game.end.roles"), ChatColor.BLUE, true);
+		String msg = "";
+		int n = 0;
+
+		// Sende allen Spieler das Wahlergebnis, Zeilenumbruch nach 2 Spielern
+		for (Gamer g : r.all_gamers) {
+			msg += ChatColor.RESET + g.longName + ": ";
+			if (g.role == Role.FACIST)
+				msg += c.getString("tr.pregame.rl_facist");
+			else if (g.role == Role.HITLER)
+				msg += c.getString("tr.pregame.rl_hitler");
+			else
+				msg += c.getString("tr.pregame.rl_liberal");
+
+			msg += "   ";
+			n++;
+			if (n == 2) {
 				r.sendMessage(msg, ChatColor.WHITE);
-
-			// Beende das Spiel
-			Main.i.delayedTask(new Runnable() {
-				@Override
-				public void run() {
-					Main.i.rooms.resetRoom(r);
-				}
-			}, 20 * 5);
+				msg = "";
+				n = 0;
+			}
 		}
+		if (msg != "")
+			r.sendMessage(msg, ChatColor.WHITE);
+
+		// Beende das Spiel
+		Main.i.delayedTask(new Runnable() {
+			@Override
+			public void run() {
+				Main.i.rooms.resetRoom(r);
+			}
+		}, 20 * 5);
+	}
 
 
 }

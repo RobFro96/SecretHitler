@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.game.Card;
@@ -51,7 +52,6 @@ public class RoomMgr {
 			return;
 		// Check: In der Lobby
 		if (g.state != 0) {
-			Main.i.mylib.sendError(g, "ingame");
 			return;
 		}
 
@@ -338,6 +338,7 @@ public class RoomMgr {
 			for (Gamer g : r.all_gamers) {
 				g.player.setScoreboard(Main.i.getServer().getScoreboardManager().getNewScoreboard());
 				g.getInventory().clear();
+				g.player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				g.state = 0;
 				g.joinedRoom = null;
 				if (!g.isDummy)
@@ -417,7 +418,7 @@ public class RoomMgr {
 				s = c.getString("config.game.last_color") + g.longName + " " + c.getString("config.game.lpresd_abbr");
 			
 			if (r.gamestate == 1) {
-				if (g.vote == -1)
+				if (g.vote == -1 || g.state == 0)
 					s = "[ ] " + s;
 				else
 					s = "[X] " + s;

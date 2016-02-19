@@ -2,6 +2,8 @@ package de.robfro.secrethitler.game;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import de.robfro.secrethitler.Main;
 import de.robfro.secrethitler.gamer.Gamer;
@@ -109,6 +111,13 @@ public class PowerMgr {
 
 	// Hinrichtung
 	public void executeGamer(Room r, Gamer g) {
+		// Statistics
+		r.president.stats.tKillesSb++;
+		g.stats.tWasKilled++;
+		
+		r.setHead(g.name, true);
+		g.player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0));
+		
 		r.clearChat();
 		r.gamestate = -1;
 		FileConfiguration c = Main.i.saves.config;

@@ -13,6 +13,8 @@ commands:
     aliases: [d]
   chgnm:
     usage: '/<command>'
+  stats:
+    usage: '/<command> [NAME]'
   wait:
     usage: '/<command> SEC'
   nominate:

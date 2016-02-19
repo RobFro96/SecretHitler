@@ -6,6 +6,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -98,7 +99,7 @@ public class AdminTools {
 			for (Gamer gam : g.dummies) {
 				gam.vote = v;
 			}
-			Main.i.vtmgr.updateVoting(dg.joinedRoom);
+			Main.i.vtmgr.updateVoting(dg.joinedRoom, dg);
 			return true;
 		}
 
@@ -228,6 +229,16 @@ public class AdminTools {
 			r.spawn = g.player.getLocation();
 			Main.i.rooms.save();
 			Main.i.mylib.sendInfo(sender, "room_spawn");
+			return true;
+		case "hm":
+			ArmorStand as = Main.i.mylib.getArmorStandInLocation(g.player.getLocation()); 
+			if (as == null) {
+				Main.i.mylib.sendError(sender, "room_hm");
+				return true;
+			}
+			r.hmloc = as.getLocation();
+			Main.i.rooms.save();
+			Main.i.mylib.sendInfo(sender, "room_hm");
 			return true;
 		case "itemFrame":
 		case "if":

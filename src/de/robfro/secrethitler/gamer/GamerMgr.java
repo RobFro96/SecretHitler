@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import de.robfro.secrethitler.Main;
 
@@ -50,10 +51,11 @@ public class GamerMgr {
 			g.player.teleport(Main.i.saves.spawnPoint);
 		if (!g.player.hasPermission("sh.admin")) {
 			g.player.getInventory().clear();
-			g.player.setGameMode(GameMode.ADVENTURE);
 		}
+		g.player.setGameMode(GameMode.ADVENTURE);
 		g.player.setLevel(0);
 		g.player.setExp(0);
+		g.player.removePotionEffect(PotionEffectType.INVISIBILITY);
 	}
 
 	// Lösche den Gamer für den Spieler, der gerade geleavt ist
@@ -115,6 +117,23 @@ public class GamerMgr {
 		g.sendMessage(ChatColor.BLUE.toString() + ChatColor.BOLD + Main.i.saves.config.getString("tr.lobby.change"));
 		g.inputLongName = true;
 
+		return true;
+	}
+	
+	// Befehl: Anzeigen der Statistik
+	public boolean onCommandSTATS(CommandSender sender, Command command, String label, String[] args) {
+		Gamer g = Main.i.mylib.getGamerFromSender(sender);
+		if (g == null)
+			return true;
+		
+		Gamer g2 = g;
+		if (args.length >= 1) {
+			Gamer x = Main.i.mylib.getGamerFromName(args[0]);
+			if (x != null)
+				g2 = x;
+		}
+		
+		g2.stats.showStats(g, g2);
 		return true;
 	}
 

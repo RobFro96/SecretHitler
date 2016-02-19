@@ -25,6 +25,7 @@ public class Gamer {
 	public int state; // 0...Lobby, 1...Ingame, 100+...itemFrames,
 						// 200+...ElectionTracker, 300...Sign
 	public String longName;
+	public Stats stats;
 
 	public boolean isDummy = false;
 	public Inventory inventory;
@@ -61,6 +62,8 @@ public class Gamer {
 		isDummy = true;
 		dummies = new ArrayList<>();
 		cDummy = -1;
+		
+		stats = new Stats();
 	}
 
 	// Dummy Konstruktor
@@ -72,6 +75,8 @@ public class Gamer {
 
 		isDummy = true;
 		inventory = Main.i.getServer().createInventory(null, InventoryType.PLAYER);
+		
+		stats = new Stats();
 	}
 
 	// Lade Daten aus der player.yml
@@ -90,6 +95,7 @@ public class Gamer {
 				Main.i.gamermgr.gamers.add(d);
 			}
 		}
+		stats = new Stats(c, name);
 
 	}
 
@@ -109,6 +115,7 @@ public class Gamer {
 			if (dummies.size() > 0)
 				c.set(name + ".dummies", dummylist);
 		}
+		stats.save(c, name);
 	}
 
 	// Sende eine Nachricht an den Spieler, wenn ein Dummy angesprochen wird
@@ -159,6 +166,10 @@ public class Gamer {
 				.then(" ")
 				.then(c.getString("tr.lobby.change_longname")).color(ChatColor.AQUA)
 				.tooltip(c.getString("tr.lobby.change_tooltip").split("\\|")).command("/chgnm").send(player);
+		
+		// Statistiks
+		new FancyMessage(c.getString("tr.stats.welcome"))
+			.then(c.getString("tr.stats.welcome_here")).color(ChatColor.AQUA).command("/stats").send(player);
 	}
 
 	// Sende die Nachricht über die Rolle
@@ -251,11 +262,11 @@ public class Gamer {
 			if (c == Main.i.cardmgr.cards.get("vt_ja")) {
 				vote = 1;
 				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_ja"));
-				Main.i.vtmgr.updateVoting(joinedRoom);
+				Main.i.vtmgr.updateVoting(joinedRoom, this);
 			} else if (c == Main.i.cardmgr.cards.get("vt_nein")) {
 				vote = 0;
 				sendMessage(ChatColor.GREEN + Main.i.saves.config.getString("tr.game.vote_nein"));
-				Main.i.vtmgr.updateVoting(joinedRoom);
+				Main.i.vtmgr.updateVoting(joinedRoom, this);
 			}
 		}
 	}

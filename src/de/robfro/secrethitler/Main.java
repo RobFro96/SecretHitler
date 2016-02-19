@@ -64,6 +64,16 @@ public class Main extends JavaPlugin {
 			}
 		}, 20L, 20L);
 		
+		// Speichere jede Minute die Spieler
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			
+			@Override
+			public void run() {
+				gamermgr.saveAllGamers();
+				getLogger().info("Saved Gamers.");
+			}
+		}, 20*60, 20*60);
+		
 	}
 
 	@Override
@@ -84,6 +94,8 @@ public class Main extends JavaPlugin {
 			return admintools.onCommandDUMMY(sender, command, label, args);
 		case "chgnm":
 			return gamermgr.onCommandCHGNM(sender, command, label, args);
+		case "stats":
+			return gamermgr.onCommandSTATS(sender, command, label, args);
 		case "wait":
 			return admintools.onCommandWAIT(sender, command, label, args);
 		case "nominate":
