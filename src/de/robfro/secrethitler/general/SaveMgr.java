@@ -102,6 +102,7 @@ public class SaveMgr {
 		config.addDefault("tr.info.defrost", "Der Spieler wurde aufgetaut.");
 
 		config.addDefault("tr.lobby.welcome", "Willkommen auf RobFros-Secret-Hitler-Server!");
+		config.addDefault("tr.lobby.original", ChatColor.RED + "Secret Hitler wurde von Max Temkin, Mike Boxleiter, Tommy Maranges erstellt und von Mackenzie Schubert illustriert.");
 		config.addDefault("tr.lobby.current_longname", "Aktueller seriöser Name: ");
 		config.addDefault("tr.lobby.change_longname", "[Ändern]");
 		config.addDefault("tr.lobby.change_tooltip",
@@ -201,7 +202,7 @@ public class SaveMgr {
 		config.addDefault("tr.game.end.facwin", "Die faschistische Partei hat das Spiel gewonnen, da ");
 		config.addDefault("tr.game.end.libplcs", "fünf liberale Artikel liegen.");
 		config.addDefault("tr.game.end.killhitler", "Hitler getötet wurde.");
-		config.addDefault("tr.game.end.facplcs", "sechs liberale Artikel liegen.");
+		config.addDefault("tr.game.end.facplcs", "sechs faschistische Artikel liegen.");
 		config.addDefault("tr.game.end.hitlerelected",
 				"Hitler zum Kanzler gewählt wurde, nachdem mindestens drei faschistische Artikel lagen.");
 		config.addDefault("tr.game.end.roles", "Hier siehst du die Rollenverteilung in diesem Spiel: ");

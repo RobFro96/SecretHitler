@@ -75,7 +75,7 @@ public class PowerMgr {
 			party = c.getString("tr.game.power.invest.fac");
 
 		r.president.sendMessage(r.formatMessage(
-				c.getString("tr.game.power.invest.result").replaceAll("#name", g.name).replaceAll("#party", party),
+				c.getString("tr.game.power.invest.result").replaceAll("#name", g.longName).replaceAll("#party", party),
 				ChatColor.BLUE, false));
 
 		Main.i.delayedTask(new Runnable() {

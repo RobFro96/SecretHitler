@@ -159,6 +159,7 @@ public class Gamer {
 		// Überschrift
 		new FancyMessage(c.getString("tr.lobby.welcome")).style(ChatColor.BOLD).color(ChatColor.BLUE)
 				.send(player);
+		player.sendMessage(c.getString("tr.lobby.original"));
 
 		// Seriöser Name
 		new FancyMessage(c.getString("tr.lobby.current_longname"))
