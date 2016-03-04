@@ -185,7 +185,6 @@ public class MyLib {
 		return null;
 	}
 
-	
 	public Sign getSignInLocation(Location loc) {
 		BlockState bs = loc.getBlock().getState();
 		if (bs instanceof Sign)

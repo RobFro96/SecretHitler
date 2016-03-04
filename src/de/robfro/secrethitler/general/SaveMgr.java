@@ -31,7 +31,7 @@ public class SaveMgr {
 	public SaveMgr() {
 		// CONFIG
 		configFile = new File(Main.i.getDataFolder(), "config.yml");
-		configFile.delete();
+		//configFile.delete();
 		config = YamlConfiguration.loadConfiguration(configFile);
 		setupDefaults();
 		loadSettings();
