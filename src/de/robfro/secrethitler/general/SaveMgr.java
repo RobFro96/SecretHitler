@@ -58,7 +58,7 @@ public class SaveMgr {
 		config.addDefault("tr.error.room_exists", "Dieser Name für einen Raum ist bereits belegt.");
 		config.addDefault("tr.error.room_exists_not", "Dieser Raum existiert nicht.");
 		config.addDefault("tr.error.if_not_exists", "Es existiert hier kein ItemFrame.");
-		config.addDefault("tr.error.sign", "Es existiert hier kein Schild.");
+		config.addDefault("tr.error.sign_not_exists", "Es existiert hier kein Schild.");
 
 		config.addDefault("tr.error.no_dummies", "Du hast keine Dummies.");
 
