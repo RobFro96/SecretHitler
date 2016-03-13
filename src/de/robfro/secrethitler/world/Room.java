@@ -231,7 +231,7 @@ public class Room {
 	// Sende an alle Spieler einen Ton
 	private void sendTone(float pitch) {
 		for (Gamer g : all_gamers)
-			g.player.playSound(g.player.getLocation(), Sound.NOTE_PLING, 1f, pitch);
+			g.player.playSound(g.player.getLocation(), Sound.valueOf("BLOCK_NOTE_PLING"), 1f, pitch);
 	}
 
 	// Update die Levelanzeige aller Spieler
