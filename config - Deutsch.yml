@@ -1,0 +1,215 @@
+tr:
+  error:
+    wrong_sender: Die Console kann diesen Befehl nicht ausführen.
+    no_permission: Du hast nicht die Rechte um diesen Befehl auszuführen.
+    number_args: Die Anzahl der Argumente ist falsch.
+    not_a_number: Dein Argument ist keine Zahl.
+    ingame: Diese Aktion darf nicht während eines Spieles ausgeführt werden.
+    not_ingame: Diese Aktion kann nur innerhalb eines Raumes ausgeführt werden.
+    playing: Diese Aktion kann nur während der Wartezeit ausgeführt werden.
+    room_exists: Dieser Name für einen Raum ist bereits belegt.
+    room_exists_not: Dieser Raum existiert nicht.
+    if_not_exists: Es existiert hier kein ItemFrame.
+    sign_not_exists: Es existiert hier kein Schild.
+    no_dummies: Du hast keine Dummies.
+    room_ingame: Dieser Raum kann nicht betreten werden, da dieser sich in einem Spiel befindet.
+    room_full: Es gibt in diesen Raum keinen freien Platz mehr.
+    drop_item: Items dürfen nicht fallengelassen werden.
+    not_presd: Nur den Präsident darf diesen Befehl ausführen.
+    not_a_player: Das Argument verweist auf keinen Spieler.
+    cant_nominated: Dieser Spieler kann nicht nominiert werden.
+    room_hm: Es wurde kein ArmorStand gefunden.
+    sign: Es existiert hier kein Schild.
+  info:
+    room_created: Der Raum wurde erfolgreich erstellt.
+    room_spawn: Der Spawnpunkt des Raumes wurde erfolgreich festgelegt.
+    room_hm: Der HangMan des Raumes wurde erfolgreich festgelegt.
+    room_material: Das ElectionTracke-Material wurde erfolgreich festgelegt.
+    room_click: 'Klicke links als nächste auf: '
+    room_if0: ItemFrameFacists1
+    room_if1: ItemFrameFacists2
+    room_if2: ItemFrameFacists3
+    room_if3: ItemFrameFacists4
+    room_if4: ItemFrameFacists5
+    room_if5: ItemFrameFacists6
+    room_if6: ItemFrameLiberal1
+    room_if7: ItemFrameLiberal2
+    room_if8: ItemFrameLiberal3
+    room_if9: ItemFrameLiberal4
+    room_if10: ItemFrameLiberal5
+    room_et0: ElectionTracker1
+    room_et1: ElectionTracker2
+    room_et2: ElectionTracker3
+    room_sign: JoinSign
+    chgnm: Dein seriöser Name wurde erfolgreich geändert.
+    all_pos: Alle Positionen wurden gesetzt. Erst jetzt wurde gespeichert.
+    disable_dummy: Du bist jetzt du selber.
+    change_dummy: 'Du hast auf folgenden Dummy gewechselt: '
+    freeze: Der Spieler wurde eingefroren.
+    defrost: Der Spieler wurde aufgetaut.
+  lobby:
+    welcome: Willkommen auf RobFros-Secret-Hitler-Server!
+    original: §cSecret Hitler wurde von Max Temkin, Mike Boxleiter, Tommy Maranges erstellt und von Mackenzie Schubert illustriert.
+    current_longname: 'Aktueller seriöser Name: '
+    change_longname: '[Ändern]'
+    change_tooltip: Ein Politiker benötigt |einen seriösen Namen. |Ändere diesen hier.
+    change: Ändere deinen Name, indem du ihn jetzt in den Chat eingibst.
+    change_info: Dein seriöser Name wurde erfolgreich geändert.
+    player: Spieler
+    waiting: OFFEN
+    playing: IM SPIEL
+    join: '#name hat den Server betreten.'
+    quit: '#name hat dem Server verlassen.'
+  waiting:
+    join: '#name hat diesen Raum betreten.'
+    quit: '#name hat diesen Raum verlassen.'
+  pregame:
+    started: Das Spiel wird gestartet.
+    your_role: 'Deine geheime Rolle in diesem Spiel ist: '
+    rl_hitler: §4Hitler
+    rl_facist: §cFaschist
+    rl_liberal: §3Liberaler
+    your_fuehrer: 'Folgender Spieler ist Hitler: '
+    other_facists: 'Folgende Spieler spielen ebenfalls als Faschist: '
+  game:
+    pres_was_elected: '#prnm wurde zum Präsidenten gewählt.'
+    nominate_chancell: Als Präsindent musst du nun einen Kanzler nominieren.
+    nom:
+      'yes': Nominiere diesen Spieler.
+      president: Der Präsident darf sich nicht nominieren.
+      last_chanc: Der letzte Kanzler darf nicht nominiert werden.
+      last_presd: Der letzte Präsident darf nicht nominiert werden.
+    vote: '#prnm schlägt #chnm als Kanzler vor. Bitte stimmt ab.'
+    votehelp: Rechtsklick mit der entsprechende Wahlkarte.
+    vote_ja: Du stimmst für den Kanzler.
+    vote_nein: Du stimmst gegen den Kanzler.
+    result: 'Die Wahl ist abgeschlossen. Hier siehst du das Wahlergebnis:'
+    result_ja: §aJA
+    result_nein: §cNEIN
+    vote_sucessf: '#chnm wurde erfolgreich zum Kanzler gewählt.'
+    vote_failed: '#chnm wurde nicht gewählt.'
+    cards_shuffled: Die Artikelkarten wurden neu gemischt.
+    et_full: Es kam zu drei Fehlwahlen in Folge. Deshalb wird der oberste Artikel aufgedeckt und gelegt. Die präsidiale Macht verfällt.
+    presd_draws: '#prnm zieht nun drei Artikelkarten und vernichtet eine davon.'
+    presd_discard: Du hast drei Artikelkarten gezogen. Du musst eine davon vernichten, indem du diese mit Q aus deinen Inventar wirfst.
+    chan_gets: '#prnm vernichtet eine Karte und gibt die anderen Beiden #chnm. Dieser
+      muss nun entscheiden welcher Artikel gelegt wird.'
+    chan_discard: 'Du hast nun zwei Artikelkarten von #prnm bekommen. Wirf eine davon
+      mit Q aus den Inventar, um diese zu vernichten. Die andere wird gelegt.'
+    veto_power: 'Du hast die Möglichkeit in Veto zu gehen: '
+    veto: '[VETO]'
+    chan_places: '#chnm hat eine Karte vernichtet und die andere auf das Brett gelegt.'
+    chanc_vetos: '#chnm reicht ein Veto ein. Nun muss #prnm bestätigen.'
+    presd_veto: 'Stimmst du den Veto con #chnm zu, um diese Runde kein Artikel zu
+      legen? '
+    veto_accept: '[VETO ZUSTIMMEN]'
+    veto_deny: '[VETO ABLEHNEN]'
+    accept: '#prnm hat das Veto angenommen. Diese Runde wird kein Artikel gelegt.'
+    deny: '#prnm hat das Veto abgelehnt. #chnm muss sich nun für ein Artikel entscheiden.'
+    power:
+      invest:
+        info: '#prnm kann nun die Parteiangehörigkeit eines Spielers erfahren.'
+        who: Von welchen Spieler willst du die Parteiangehörigkeit erfahren?
+        this: Wähle diesen Spieler.
+        you: Du kannst dich nicht selber überprüfen.
+        was_invest: Dieser Spieler wurde schon einmal überprüft.
+        invest: '#prnm überprüft die Parteiangehörigkeit von #name.'
+        result: '#name gehört der #party Partei an.'
+        fac: faschisten
+        lib: liberalen
+      presd:
+        info: '#prnm darf nun den nächsten Präsidenten bestimmen.'
+        who: Welcher Spieler soll nächster Präsident werden?
+        this: Wähle diesen Spieler.
+        you: Du kannst dich nicht selber wählen.
+      exam:
+        info: '#prnm kann nun die nächsten drei Artikel vom Stapel betrachten.'
+        result: 'Die nächsten drei Artikel sind: '
+        fac: '§c[Faschistisch] '
+        lib: '§3[Liberal] '
+      veto:
+        info: Das Vetorecht wurde freigeschalten.
+      kill:
+        info: '#prnm muss nun einen Spieler hinrichten.'
+        who: Welchen Spieler soll hingerichtet werden?
+        this: Wähle diesen Spieler.
+        you: Du kannst dich nicht selber hinrichten lassen.
+        kill: '#name wurde hingerichtet.'
+    end:
+      libwin: 'Die liberale Partei hat das Spiel gewonnen, da '
+      facwin: 'Die faschistische Partei hat das Spiel gewonnen, da '
+      libplcs: fünf liberale Artikel liegen.
+      killhitler: Hitler getötet wurde.
+      facplcs: sechs faschistische Artikel liegen.
+      hitlerelected: Hitler zum Kanzler gewählt wurde, nachdem mindestens drei faschistische Artikel lagen.
+      roles: 'Hier siehst du die Rollenverteilung in diesem Spiel: '
+      lessplayer: Das Spiel musste beendet werden, da zu wenige Spieler noch da sind.
+    warn_chancell: Achtung! Es liegen drei Faschistische Artikel. Sollte nun Hitler zum Kanzler gewählt werden, so kommt es zur Machtergreifung.
+  stats:
+    title: 'STATISTIK von #name'
+    games: 'Gespielte Spiele: '
+    lib: 'Liberal: '
+    fac: 'Faschist: '
+    hitler: 'Hitler: '
+    won: 'Gewonnene Spiele: '
+    tpresd: 'Präsindentschaften: '
+    tchanc: 'Kanzlerschaften: '
+    killedsb: 'Hinrichtungen: '
+    waskilled: 'Tode: '
+    tlast: 'Letzter in Abstimmung: '
+    welcome: 'Zeige deine Statistik an: '
+    welcome_here: '[HIER]'
+  command:
+    test: Teste als Admin die eines Unterprogramms.
+    room: Bearbeite oder erstelle einen Raum.
+    dummy: Wechsele auf eine Dummy oder zurück zu dir selbst.
+    chgnm: Ändere deinen seriösen Namen mit diesem Befehl.
+    stats: Schau dir deine Statistik oder die eines anderen Spielers an.
+    wait: Setze als Admin die Wartezeit innerhalb eines Raumes.
+    nominate: Wird genutz, um einen Spieler zu nominieren.
+    veto: Wird genutzt, um in Veto zu gehen.
+    frz: Friere einen Spieler ein oder taue diesen wieder auf.
+  maps:
+    plc_liberal: Liberaler Artikel
+    plc_facist: Faschistischer Artikel
+    rl_facist: 'Rolle: Faschist'
+    rl_hitler: 'Rolle: Hitler'
+    rl_liberal: 'Rolle: Liberaler'
+    vt_ja: JA
+    vt_nein: NEIN
+config:
+  allow_chat_in_lobby: true
+  max_player_in_room: 10
+  spawnpoint: 8,22,30
+  wait:
+    min_player: 5
+    wait_at_min: 60
+    less_per_player: 10
+  maps:
+    plc_liberal: 100
+    plc_facist: 101
+    rl_facist: 102
+    rl_hitler: 103
+    rl_liberal: 104
+    vt_ja: 105
+    vt_nein: 106
+    brd_facempty: 107
+    brd_facend: 108
+    brd_invest: 109
+    brd_kill: 110
+    brd_veto: 111
+    brd_libempty: 112
+    brd_libend: 113
+    brd_presd: 114
+    brd_exam: 115
+  game:
+    liberal_plcs: 6
+    facist_plcs: 11
+    presd_color: §2
+    presd_abbr: '[P]'
+    chanc_color: §6
+    chanc_abbr: '[K]'
+    last_color: §7
+    dead_color: §8
+    lchanc_abbr: '[lK]'
+    lpresd_abbr: '[lP]'
