@@ -101,6 +101,10 @@ public class AdminTools {
 			}
 			Main.i.vtmgr.updateVoting(dg.joinedRoom, dg);
 			return true;
+		case "kill":
+			Room r2 = Main.i.rooms.rooms.get("Raum1");
+			r2.setHead("RobFro", true);
+			return true;
 		}
 
 

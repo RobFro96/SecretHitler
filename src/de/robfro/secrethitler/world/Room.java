@@ -267,9 +267,11 @@ public class Room {
 		as.setHelmet(is);
 		
 		if (rocket) {
-			Firework fw = (Firework) as.getWorld().spawnEntity(as.getLocation(), EntityType.FIREWORK);
+			Location loc = as.getLocation();
+			loc.add(0, 2f, 0);
+			Firework fw = (Firework) as.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 			FireworkMeta fm = fw.getFireworkMeta();
-			 			 
+				 
 			FireworkEffect effect = FireworkEffect.builder().withColor(Color.RED).with(Type.BALL_LARGE).build();
 			fm.addEffect(effect);
 			fm.setPower(0);
