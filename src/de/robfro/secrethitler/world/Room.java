@@ -268,7 +268,7 @@ public class Room {
 		
 		if (rocket) {
 			Location loc = as.getLocation();
-			loc.add(0, 2f, 0);
+			loc.add(0, 5f, 0);
 			Firework fw = (Firework) as.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 			FireworkMeta fm = fw.getFireworkMeta();
 				 
